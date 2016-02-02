@@ -1,4 +1,4 @@
-package myportfolio.udacity.com.myappportfolio;
+package myportfolio.com.udacity.myappportfolio;
 
 import org.junit.Test;
 
