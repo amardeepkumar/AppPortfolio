@@ -10,7 +10,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".MainActivity"
+    tools:context=".activity.MainActivity"
     tools:showIn="@layout/activity_main">
 
     <RelativeLayout
@@ -27,7 +27,7 @@
             android:text="@string/app_header" />
 
         <Button
-            android:id="@+id/sopify_streamer"
+            android:id="@+id/sopifyStreamer"
             style="@style/button_style_orange"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -38,11 +38,11 @@
             android:text="@string/sopify_streamer" />
 
         <Button
-            android:id="@+id/super_duo"
+            android:id="@+id/superDuo"
             style="@style/button_style_orange"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/sopify_streamer"
+            android:layout_below="@id/sopifyStreamer"
             android:layout_marginBottom="@dimen/activity_horizontal_margin"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
@@ -54,14 +54,14 @@
             style="@style/button_style_orange"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/super_duo"
+            android:layout_below="@id/superDuo"
             android:layout_marginBottom="@dimen/activity_horizontal_margin"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:text="@string/build_it_bigger" />
 
         <Button
-            android:id="@+id/xyz_reader"
+            android:id="@+id/xyzReader"
             style="@style/button_style_orange"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -76,7 +76,7 @@
             style="@style/button_style_red"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/xyz_reader"
+            android:layout_below="@id/xyzReader"
             android:layout_marginBottom="@dimen/activity_horizontal_margin"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"

@@ -1,13 +1,16 @@
-package com.udacity.myappportfolio;
+package com.udacity.myappportfolio.activity;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
+
+import com.udacity.myappportfolio.R;
+import com.udacity.myappportfolio.databinding.ActivityMainBinding;
 
 /**
  * Created by Amardeep on 27/1/16.
@@ -18,18 +21,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DataBindingUtil.setContentView(this, R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        initView();
+        ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        setSupportActionBar(binding.toolbar);
+        initView(binding);
     }
 
-    private void initView() {
-        findViewById(R.id.sopify_streamer).setOnClickListener(this);
-        findViewById(R.id.super_duo).setOnClickListener(this);
-        findViewById(R.id.build_it_bigger).setOnClickListener(this);
-        findViewById(R.id.xyz_reader).setOnClickListener(this);
-        findViewById(R.id.capstone).setOnClickListener(this);
+    private void initView(ActivityMainBinding binding) {
+        binding.sopifyStreamer.setOnClickListener(this);
+        binding.superDuo.setOnClickListener(this);
+        binding.buildItBigger.setOnClickListener(this);
+        binding.xyzReader.setOnClickListener(this);
+        binding.capstone.setOnClickListener(this);
     }
 
     @Override
@@ -58,11 +60,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         int toastMessageStringId;
         switch (v.getId()) {
-            case R.id.sopify_streamer:
+            case R.id.sopifyStreamer:
                 toastMessageStringId = R.string.sopify_streamer_message;
+                startActivity(new Intent(this, MovieActivity.class));
                 break;
 
-            case R.id.super_duo:
+            case R.id.superDuo:
                 toastMessageStringId = R.string.super_duo_message;
                 break;
 
@@ -70,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 toastMessageStringId = R.string.build_it_bigger_message;
                 break;
 
-            case R.id.xyz_reader:
+            case R.id.xyzReader:
                 toastMessageStringId = R.string.xyz_reader_message;
                 break;
 

@@ -13,4 +13,6 @@
     <string name="xyz_reader_message">This button will launch XYZ reader app</string>
     <string name="capstone_message">This button will launch Capstone app</string>
     <string name="default_message">Other item clicked</string>
+    <string name="loading">Loading&#8230;</string>
+    <string name="loading_more_movie_list">Loading more movie list</string>
 </resources>
