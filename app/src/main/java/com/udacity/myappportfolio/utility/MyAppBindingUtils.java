@@ -4,7 +4,6 @@ import android.databinding.BindingAdapter;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.udacity.myappportfolio.R;

@@ -6,7 +6,6 @@ import android.support.v7.app.ActionBar;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 
 import com.udacity.myappportfolio.R;
 import com.udacity.myappportfolio.adapter.MovieGalleryAdapter;
@@ -75,8 +74,10 @@ public class MovieActivity extends BaseActivity implements MovieGalleryAdapter.O
         super.onBackPressed();
         if (!getResources().getBoolean(R.bool.isTablet)) {
             ActionBar actionBar = getSupportActionBar();
-            actionBar.setTitle("Popular Movies");
-            actionBar.setDisplayHomeAsUpEnabled(false);
+            if (actionBar != null) {
+                actionBar.setTitle(R.string.popular_movies);
+                actionBar.setDisplayHomeAsUpEnabled(false);
+            }
         }
     }
 }

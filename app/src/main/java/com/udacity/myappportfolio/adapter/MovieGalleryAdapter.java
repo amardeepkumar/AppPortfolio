@@ -3,7 +3,6 @@ package com.udacity.myappportfolio.adapter;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +11,6 @@ import com.udacity.myappportfolio.R;
 import com.udacity.myappportfolio.databinding.ItemMovieGalleryBinding;
 import com.udacity.myappportfolio.model.response.MovieResult;
 import com.udacity.myappportfolio.utility.CollectionUtils;
-import com.udacity.myappportfolio.utility.DialogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +29,8 @@ public class MovieGalleryAdapter  extends RecyclerView.Adapter<MovieGalleryAdapt
 
     private final LayoutInflater mLayoutInflater;
     private final List<MovieResult> mMovieResult;
-    private final Context mContext;
 
     public MovieGalleryAdapter(Context context, OnItemClickListener itemClickListener) {
-        mContext = context;
         mOnItemClickListener = itemClickListener;
         mMovieResult = new ArrayList<>();
         mLayoutInflater = LayoutInflater.from(context);
@@ -86,7 +82,6 @@ public class MovieGalleryAdapter  extends RecyclerView.Adapter<MovieGalleryAdapt
 
         public void OnItemClicked(View view) {
             mOnItemClickListener.OnItemClicked(mMovieResult.get(getAdapterPosition()).getId());
-            DialogUtils.showToast("Item Clicked", mContext);
         }
     }
 }

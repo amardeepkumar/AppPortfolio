@@ -1,7 +1,6 @@
 package com.udacity.myappportfolio.fragment;
 
 import android.databinding.DataBindingUtil;
-import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -11,11 +10,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.udacity.myappportfolio.R;
 import com.udacity.myappportfolio.databinding.FragmentMovieDetailBinding;
-import com.udacity.myappportfolio.databinding.FragmentMovieGalleryBinding;
 import com.udacity.myappportfolio.model.response.MovieDetailResponse;
 import com.udacity.myappportfolio.network.NetworkManager;
 import com.udacity.myappportfolio.utility.Constants;
@@ -59,9 +56,11 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
 
         if (!getResources().getBoolean(R.bool.isTablet)) {
             ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-            actionBar.setTitle("Movie Details");
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeButtonEnabled(true);
+            if (actionBar != null) {
+                actionBar.setTitle(R.string.movie_details);
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setHomeButtonEnabled(true);
+            }
         }
 
         loadMovieDetails();
@@ -76,14 +75,15 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
     }
 
     private void loadMovieDetails() {
-        DialogUtils.displayProgressDialog(mContext);
+        if (binding != null) {
+            binding.progressBar.setVisibility(View.VISIBLE);
+        }
         NetworkManager.requestMovieDetails(KeyConstants.API_KEY, mMovieId, this);
     }
 
     public void loadMovieDetails(int movieId) {
         mMovieId = movieId;
-        DialogUtils.displayProgressDialog(mContext);
-        NetworkManager.requestMovieDetails(KeyConstants.API_KEY, mMovieId, this);
+        loadMovieDetails();
     }
 
     @Override
@@ -92,14 +92,19 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
                 && response.body() != null) {
             binding.setData(response.body());
             Log.d(TAG, "response = " + response);
-            DialogUtils.hideProgressDialog();
+            if (binding != null) {
+                binding.progressBar.setVisibility(View.GONE);
+            }
         }
     }
 
     @Override
     public void onFailure(Call<MovieDetailResponse> call, Throwable t) {
         DialogUtils.showToast("response failed", mContext);
-        DialogUtils.hideProgressDialog();
+
+        if (binding != null) {
+            binding.progressBar.setVisibility(View.GONE);
+        }
     }
 
     @Override

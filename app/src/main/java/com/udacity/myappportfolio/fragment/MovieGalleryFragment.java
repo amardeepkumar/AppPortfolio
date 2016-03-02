@@ -48,7 +48,7 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
                 mCurrentPage = response.body().getPage();
                 ((MovieGalleryAdapter) binding.movieList.getAdapter()).reSetMovieList(response.body().getResults());
                 Log.d(TAG, "response = " + response);
-                DialogUtils.hideProgressDialog();
+                binding.progressBar.setVisibility(View.GONE);
             }
         }
 
@@ -56,7 +56,7 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
         public void onFailure(Call<DiscoverMovieResponse> call, Throwable t) {
             loading = false;
             DialogUtils.showToast("response failed", mContext);
-            DialogUtils.hideProgressDialog();
+            binding.progressBar.setVisibility(View.GONE);
         }
     };
 
@@ -139,9 +139,10 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
 
     private void loadMore(Callback<DiscoverMovieResponse> callBack) {
         loading = true;
-        DialogUtils.displayProgressDialog(mContext);
+        if (binding != null) {
+            binding.progressBar.setVisibility(View.VISIBLE);
+        }
         NetworkManager.requestMovies(mSortBy, KeyConstants.API_KEY, mCurrentPage + 1, callBack);
-        DialogUtils.showToast(R.string.loading_more_movie_list, mContext);
     }
 
     @Override
@@ -152,7 +153,9 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
             mCurrentPage = response.body().getPage();
             ((MovieGalleryAdapter) binding.movieList.getAdapter()).setMovieList(response.body().getResults());
             Log.d(TAG, "response = " + response);
-            DialogUtils.hideProgressDialog();
+            if (binding != null) {
+                binding.progressBar.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -160,7 +163,9 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
     public void onFailure(Call<DiscoverMovieResponse> call, Throwable t) {
         loading = false;
         DialogUtils.showToast("response failed", mContext);
-        DialogUtils.hideProgressDialog();
+        if (binding != null) {
+            binding.progressBar.setVisibility(View.GONE);
+        }
     }
 
     @Override
