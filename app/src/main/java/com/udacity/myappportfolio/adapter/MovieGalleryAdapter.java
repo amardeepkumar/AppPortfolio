@@ -22,10 +22,11 @@ public class MovieGalleryAdapter  extends RecyclerView.Adapter<MovieGalleryAdapt
 
     private static final String TAG = MovieGalleryAdapter.class.getSimpleName();
     private final OnItemClickListener mOnItemClickListener;
-    private int previousSelection = -1;
+    private int previousSelection = 0;
 
     public interface OnItemClickListener {
         void OnItemClicked(int movieId);
+        void loadMovieDetail(int movieId);
     }
 
     private final LayoutInflater mLayoutInflater;
@@ -83,7 +84,7 @@ public class MovieGalleryAdapter  extends RecyclerView.Adapter<MovieGalleryAdapt
 
         public void OnItemClicked(View view) {
             final int adapterPosition = getAdapterPosition();
-            if (previousSelection != -1 && previousSelection != adapterPosition) {
+            if (previousSelection != adapterPosition) {
                 mMovieResult.get(previousSelection).setSelected(false);
             }
             MovieResult movie = mMovieResult.get(adapterPosition);
@@ -91,5 +92,9 @@ public class MovieGalleryAdapter  extends RecyclerView.Adapter<MovieGalleryAdapt
             mOnItemClickListener.OnItemClicked(movie.getId());
             previousSelection = adapterPosition;
         }
+    }
+
+    public void resetSelection() {
+        previousSelection = 0;
     }
 }

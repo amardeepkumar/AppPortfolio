@@ -63,6 +63,13 @@ public class MovieActivity extends BaseActivity implements MovieGalleryAdapter.O
     }
 
     @Override
+    public void loadMovieDetail(int movieId) {
+        if (mMovieDetailFragment != null) {
+            mMovieDetailFragment.loadMovieDetails(movieId);
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);

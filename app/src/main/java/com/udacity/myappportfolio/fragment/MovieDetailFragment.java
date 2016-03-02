@@ -18,6 +18,7 @@ import com.udacity.myappportfolio.network.NetworkManager;
 import com.udacity.myappportfolio.utility.Constants;
 import com.udacity.myappportfolio.utility.DialogUtils;
 import com.udacity.myappportfolio.utility.KeyConstants;
+import com.udacity.myappportfolio.utility.NetworkUtil;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -75,10 +76,14 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
     }
 
     private void loadMovieDetails() {
-        if (binding != null) {
-            binding.progressBar.setVisibility(View.VISIBLE);
+        if (NetworkUtil.isConnectionAvailable(mContext)) {
+            if (binding != null) {
+                binding.progressBar.setVisibility(View.VISIBLE);
+            }
+            NetworkManager.requestMovieDetails(KeyConstants.API_KEY, mMovieId, this);
+        } else {
+            DialogUtils.showToast(R.string.no_network, mContext);
         }
-        NetworkManager.requestMovieDetails(KeyConstants.API_KEY, mMovieId, this);
     }
 
     public void loadMovieDetails(int movieId) {

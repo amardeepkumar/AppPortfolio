@@ -16,11 +16,13 @@ import com.udacity.myappportfolio.R;
 import com.udacity.myappportfolio.adapter.MovieGalleryAdapter;
 import com.udacity.myappportfolio.databinding.FragmentMovieGalleryBinding;
 import com.udacity.myappportfolio.model.response.DiscoverMovieResponse;
+import com.udacity.myappportfolio.model.response.MovieResult;
 import com.udacity.myappportfolio.network.Config;
 import com.udacity.myappportfolio.network.NetworkManager;
 import com.udacity.myappportfolio.utility.CollectionUtils;
 import com.udacity.myappportfolio.utility.DialogUtils;
 import com.udacity.myappportfolio.utility.KeyConstants;
+import com.udacity.myappportfolio.utility.NetworkUtil;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -117,19 +119,15 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
         switch (item.getItemId()) {
             case R.id.sort_by_popular:
                 if (!item.isChecked()) {
-                    item.setChecked(!item.isChecked());
                     mSortBy = Config.UrlConstants.SORT_POPULARITY_DESC;
-                    mCurrentPage = 0;
-                    loadMore(mCallBack);
+                    sortList(item);
                 }
                 return true;
 
             case R.id.sort_by_highest_rated:
                 if (!item.isChecked()) {
-                    item.setChecked(!item.isChecked());
                     mSortBy = Config.UrlConstants.SORT_VOTE_AVERAGE_DESC;
-                    mCurrentPage = 0;
-                    loadMore(mCallBack);
+                    sortList(item);
                 }
                 return true;
 
@@ -138,12 +136,26 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
         }
     }
 
+    private void sortList(MenuItem item) {
+        item.setChecked(true);
+        mCurrentPage = 0;
+        loadMore(mCallBack);
+        ((MovieGalleryAdapter)binding.movieList.getAdapter()).resetSelection();
+    }
+
     private void loadMore(Callback<DiscoverMovieResponse> callBack) {
-        loading = true;
-        if (binding != null) {
-            binding.progressBar.setVisibility(View.VISIBLE);
+        if (NetworkUtil.isConnectionAvailable(mContext)) {
+            loading = true;
+            if (binding != null) {
+                binding.progressBar.setVisibility(View.VISIBLE);
+            }
+            NetworkManager.requestMovies(mSortBy, KeyConstants.API_KEY, mCurrentPage + 1, callBack);
+        } else {
+            DialogUtils.showToast(R.string.no_network, mContext);
+            if (binding != null) {
+                binding.progressBar.setVisibility(View.VISIBLE);
+            }
         }
-        NetworkManager.requestMovies(mSortBy, KeyConstants.API_KEY, mCurrentPage + 1, callBack);
     }
 
     @Override
@@ -152,12 +164,16 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
         if (response != null && response.isSuccess()
                 && response.body() != null) {
             mCurrentPage = response.body().getPage();
-            ((MovieGalleryAdapter) binding.movieList.getAdapter()).setMovieList(response.body().getResults());
 
-            if (getResources().getBoolean(R.bool.isTablet) && !CollectionUtils.isEmpty(response.body().getResults())) {
-                int movieId = response.body().getResults().get(0).getId();
-                mItemClickListener.OnItemClicked(movieId);
+            if (getResources().getBoolean(R.bool.isTablet)
+                    && !CollectionUtils.isEmpty(response.body().getResults())
+                    && mCurrentPage == 1) {
+                final MovieResult movieResult = response.body().getResults().get(0);
+                movieResult.setSelected(true);
+                final int movieId = movieResult.getId();
+                mItemClickListener.loadMovieDetail(movieId);
             }
+            ((MovieGalleryAdapter) binding.movieList.getAdapter()).setMovieList(response.body().getResults());
 
             Log.d(TAG, "response = " + response);
             if (binding != null) {
