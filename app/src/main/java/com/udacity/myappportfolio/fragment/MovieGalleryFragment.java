@@ -84,7 +84,6 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSortBy = Config.UrlConstants.SORT_POPULARITY_DESC;
-        loadMore(this);
     }
 
     @Nullable
@@ -111,6 +110,7 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
                 }
             }
         });
+        loadMore(this);
         return binding.getRoot();
     }
 
@@ -153,7 +153,7 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
         } else {
             DialogUtils.showToast(R.string.no_network, mContext);
             if (binding != null) {
-                binding.progressBar.setVisibility(View.VISIBLE);
+                binding.progressBar.setVisibility(View.GONE);
             }
         }
     }

@@ -63,8 +63,6 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
                 actionBar.setHomeButtonEnabled(true);
             }
         }
-
-        loadMovieDetails();
     }
 
     @Nullable
@@ -72,6 +70,7 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie_detail, container, false);
 
+        loadMovieDetails();
         return binding.getRoot();
     }
 
@@ -83,6 +82,9 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
             NetworkManager.requestMovieDetails(KeyConstants.API_KEY, mMovieId, this);
         } else {
             DialogUtils.showToast(R.string.no_network, mContext);
+            if (binding != null) {
+                binding.progressBar.setVisibility(View.GONE);
+            }
         }
     }
 
