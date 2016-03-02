@@ -15,4 +15,6 @@
     <string name="default_message">Other item clicked</string>
     <string name="loading">Loading&#8230;</string>
     <string name="loading_more_movie_list">Loading more movie list</string>
+    <string name="sort_by_popular">Sort by most popular</string>
+    <string name="sort_by_highest_rated">Sort by highest rated</string>
 </resources>

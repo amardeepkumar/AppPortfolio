@@ -12,7 +12,8 @@ public class Config {
         String SORT_BY = "sort_by";
         String API_KEY = "api_key";
         String PAGE = "page";
-        String SORT_DESC = "popularity.des";
+        String SORT_POPULARITY_DESC = "popularity.des";
+        String SORT_VOTE_AVERAGE_DESC = "vote_average.desc";
         String ID = "id";
     }
 }

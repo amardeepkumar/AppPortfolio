@@ -1,10 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".activity.MainActivity">
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+    <group
+        android:id="@+id/sort_group"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/sort_by_popular"
+            android:checked="true"
+            android:title="@string/sort_by_popular" />
+        <item
+            android:id="@+id/sort_by_highest_rated"
+            android:title="@string/sort_by_highest_rated" />
+    </group>
 </menu>

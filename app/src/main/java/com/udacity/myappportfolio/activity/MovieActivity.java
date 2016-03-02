@@ -2,7 +2,11 @@ package com.udacity.myappportfolio.activity;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.udacity.myappportfolio.R;
 import com.udacity.myappportfolio.adapter.MovieGalleryAdapter;
@@ -31,22 +35,13 @@ public class MovieActivity extends BaseActivity implements MovieGalleryAdapter.O
             mMovieDetailFragment = (MovieDetailFragment) getSupportFragmentManager().findFragmentById(R.id.movie_detail_fragment);
         } else {
             if (findViewById(R.id.fragment_container) != null) {
-
-                // However, if we're being restored from a previous state,
-                // then we don't need to do anything and should return or else
-                // we could end up with overlapping fragments.
                 if (savedInstanceState != null) {
                     return;
                 }
 
                 // Create a new Fragment to be placed in the activity layout
                 MovieGalleryFragment firstFragment = new MovieGalleryFragment();
-
-                // In case this activity was started with special instructions from an
-                // Intent, pass the Intent's extras to the fragment as arguments
                 firstFragment.setArguments(getIntent().getExtras());
-
-                // Add the fragment to the 'fragment_container' FrameLayout
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.fragment_container, firstFragment).commit();
             }
@@ -65,6 +60,39 @@ public class MovieActivity extends BaseActivity implements MovieGalleryAdapter.O
                     MovieDetailFragment.getInstance(movieId)).addToBackStack(null).commit();
         } else if (mMovieDetailFragment != null) {
             mMovieDetailFragment.loadMovieDetails(movieId);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sort_by_popular:
+                item.setChecked(!item.isChecked());
+                return true;
+
+            case R.id.sort_by_highest_rated:
+                item.setChecked(!item.isChecked());
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (!getResources().getBoolean(R.bool.isTablet)) {
+            ActionBar actionBar = getSupportActionBar();
+            actionBar.setTitle("Popular Movies");
+            actionBar.setDisplayHomeAsUpEnabled(false);
         }
     }
 }

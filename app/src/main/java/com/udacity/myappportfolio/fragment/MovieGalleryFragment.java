@@ -61,7 +61,7 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie_gallery, container, false);
         final GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 2);
         binding.movieList.setLayoutManager(gridLayoutManager);
-        binding.movieList.setAdapter(new MovieGalleryAdapter(mContext,  mItemClickListener));
+        binding.movieList.setAdapter(new MovieGalleryAdapter(mContext, mItemClickListener));
         binding.movieList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -85,7 +85,7 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
     private void loadMore() {
         loading = true;
         DialogUtils.displayProgressDialog(mContext);
-        NetworkManager.requestMovies(Config.UrlConstants.SORT_DESC, KeyConstants.API_KEY, mCurrentPage + 1, this);
+        NetworkManager.requestMovies(Config.UrlConstants.SORT_POPULARITY_DESC, KeyConstants.API_KEY, mCurrentPage + 1, this);
         DialogUtils.showToast(R.string.loading_more_movie_list, mContext);
     }
 
