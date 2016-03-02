@@ -1,10 +1,16 @@
 package com.udacity.myappportfolio.model.response;
 
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
+
 import com.google.gson.annotations.SerializedName;
+import com.udacity.myappportfolio.BR;
 
 import java.util.List;
 
-public class MovieResult {
+public class MovieResult extends BaseObservable {
+    @Bindable
+    private transient boolean selected;
     @SerializedName("poster_path")
     private String posterPath;
     @SerializedName("adult")
@@ -33,6 +39,15 @@ public class MovieResult {
     private boolean mIsVideo;
     @SerializedName("vote_average")
     private float mVoteAverage;
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean isSelected) {
+        this.selected = isSelected;
+        notifyPropertyChanged(BR.selected);
+    }
 
     public String getPosterPath() {
         return posterPath;

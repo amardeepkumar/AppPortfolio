@@ -12,6 +12,8 @@
             type="com.udacity.myappportfolio.adapter.MovieGalleryAdapter.MovieGalleryViewHolder"/>
     </data>
     <ImageView
+        android:background="@{data.selected ? @color/colorPrimary : @android:color/white}"
+        android:padding="@dimen/dp_10"
         android:scaleType="fitXY"
         android:id="@+id/image_view_item"
         android:layout_width="match_parent"
