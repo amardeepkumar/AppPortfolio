@@ -18,6 +18,7 @@ import com.udacity.myappportfolio.databinding.FragmentMovieGalleryBinding;
 import com.udacity.myappportfolio.model.response.DiscoverMovieResponse;
 import com.udacity.myappportfolio.network.Config;
 import com.udacity.myappportfolio.network.NetworkManager;
+import com.udacity.myappportfolio.utility.CollectionUtils;
 import com.udacity.myappportfolio.utility.DialogUtils;
 import com.udacity.myappportfolio.utility.KeyConstants;
 
@@ -152,6 +153,12 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
                 && response.body() != null) {
             mCurrentPage = response.body().getPage();
             ((MovieGalleryAdapter) binding.movieList.getAdapter()).setMovieList(response.body().getResults());
+
+            if (getResources().getBoolean(R.bool.isTablet) && !CollectionUtils.isEmpty(response.body().getResults())) {
+                int movieId = response.body().getResults().get(0).getId();
+                mItemClickListener.OnItemClicked(movieId);
+            }
+
             Log.d(TAG, "response = " + response);
             if (binding != null) {
                 binding.progressBar.setVisibility(View.GONE);
