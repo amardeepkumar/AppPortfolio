@@ -18,7 +18,7 @@ public class MyAppBindingUtils {
     public static void loadImage(ImageView view, String url) {
         if (!TextUtils.isEmpty(url)) {
             Glide.with(view.getContext()).load(Config.UrlConstants.IMAGE_BASE_URL + url).placeholder(ContextCompat.getDrawable(view.getContext(),
-                    R.drawable.ic_launcher)).into(view);
+                    R.drawable.placeholder)).into(view);
         }
     }
 }

@@ -64,22 +64,6 @@ public class MovieActivity extends BaseActivity implements MovieGalleryAdapter.O
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.sort_by_popular:
-                item.setChecked(!item.isChecked());
-                return true;
-
-            case R.id.sort_by_highest_rated:
-                item.setChecked(!item.isChecked());
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);

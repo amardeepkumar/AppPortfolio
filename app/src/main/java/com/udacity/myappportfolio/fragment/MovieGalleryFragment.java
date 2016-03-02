@@ -8,6 +8,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -37,6 +38,27 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
     private int firstVisibleItem;
     private int mCurrentPage;
     private MovieGalleryAdapter.OnItemClickListener mItemClickListener;
+    private String mSortBy;
+    private Callback<DiscoverMovieResponse> mCallBack = new Callback<DiscoverMovieResponse>() {
+        @Override
+        public void onResponse(Call<DiscoverMovieResponse> call, Response<DiscoverMovieResponse> response) {
+            loading = false;
+            if (response != null && response.isSuccess()
+                    && response.body() != null) {
+                mCurrentPage = response.body().getPage();
+                ((MovieGalleryAdapter) binding.movieList.getAdapter()).reSetMovieList(response.body().getResults());
+                Log.d(TAG, "response = " + response);
+                DialogUtils.hideProgressDialog();
+            }
+        }
+
+        @Override
+        public void onFailure(Call<DiscoverMovieResponse> call, Throwable t) {
+            loading = false;
+            DialogUtils.showToast("response failed", mContext);
+            DialogUtils.hideProgressDialog();
+        }
+    };
 
     @Override
     public void onAttach(Context context) {
@@ -50,9 +72,16 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        loadMore();
+        mSortBy = Config.UrlConstants.SORT_POPULARITY_DESC;
+        loadMore(this);
     }
 
     @Nullable
@@ -73,7 +102,7 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
 
                     if (!loading) {
                         if ((visibleItemCount + firstVisibleItem) >= totalItemCount) {
-                            loadMore();
+                            loadMore(MovieGalleryFragment.this);
                         }
                     }
                 }
@@ -82,10 +111,36 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
         return binding.getRoot();
     }
 
-    private void loadMore() {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sort_by_popular:
+                if (!item.isChecked()) {
+                    item.setChecked(!item.isChecked());
+                    mSortBy = Config.UrlConstants.SORT_POPULARITY_DESC;
+                    mCurrentPage = 0;
+                    loadMore(mCallBack);
+                }
+                return true;
+
+            case R.id.sort_by_highest_rated:
+                if (!item.isChecked()) {
+                    item.setChecked(!item.isChecked());
+                    mSortBy = Config.UrlConstants.SORT_VOTE_AVERAGE_DESC;
+                    mCurrentPage = 0;
+                    loadMore(mCallBack);
+                }
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void loadMore(Callback<DiscoverMovieResponse> callBack) {
         loading = true;
         DialogUtils.displayProgressDialog(mContext);
-        NetworkManager.requestMovies(Config.UrlConstants.SORT_POPULARITY_DESC, KeyConstants.API_KEY, mCurrentPage + 1, this);
+        NetworkManager.requestMovies(mSortBy, KeyConstants.API_KEY, mCurrentPage + 1, callBack);
         DialogUtils.showToast(R.string.loading_more_movie_list, mContext);
     }
 

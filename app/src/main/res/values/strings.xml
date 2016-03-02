@@ -17,4 +17,6 @@
     <string name="loading_more_movie_list">Loading more movie list</string>
     <string name="sort_by_popular">Sort by most popular</string>
     <string name="sort_by_highest_rated">Sort by highest rated</string>
+    <string name="vote_average">Rating : %s</string>
+    <string name="released_date">Released On : %s</string>
 </resources>

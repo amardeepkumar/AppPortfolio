@@ -106,7 +106,6 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case android.R.id.home:
-                Toast.makeText(getActivity(), "Back from fragment", Toast.LENGTH_SHORT).show();
                 getActivity().onBackPressed();
                 return true;
         }

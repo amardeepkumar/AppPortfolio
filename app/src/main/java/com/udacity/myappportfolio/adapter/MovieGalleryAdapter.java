@@ -3,6 +3,7 @@ package com.udacity.myappportfolio.adapter;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import java.util.List;
  */
 public class MovieGalleryAdapter  extends RecyclerView.Adapter<MovieGalleryAdapter.MovieGalleryViewHolder> {
 
+    private static final String TAG = MovieGalleryAdapter.class.getSimpleName();
     private final OnItemClickListener mOnItemClickListener;
 
     public interface OnItemClickListener {
@@ -62,8 +64,9 @@ public class MovieGalleryAdapter  extends RecyclerView.Adapter<MovieGalleryAdapt
 
     public void setMovieList(List<MovieResult> movieList) {
         if (!CollectionUtils.isEmpty(movieList)) {
+            int positionStart = getItemCount() + 1;
             mMovieResult.addAll(movieList);
-            notifyItemRangeInserted(getItemCount(), movieList.size());
+            notifyItemRangeInserted(positionStart, movieList.size());
         }
     }
 

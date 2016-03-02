@@ -55,7 +55,7 @@ public class MovieDetailResponse {
     @SerializedName("video")
     private boolean video;
     @SerializedName("vote_average")
-    private double voteAverage;
+    private float voteAverage;
     @SerializedName("vote_count")
     private int voteCount;
 
@@ -243,11 +243,11 @@ public class MovieDetailResponse {
         this.video = video;
     }
 
-    public double getVoteAverage() {
+    public float getVoteAverage() {
         return voteAverage;
     }
 
-    public void setVoteAverage(double voteAverage) {
+    public void setVoteAverage(float voteAverage) {
         this.voteAverage = voteAverage;
     }
 
