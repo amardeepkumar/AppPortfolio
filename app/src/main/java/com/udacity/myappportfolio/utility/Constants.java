@@ -8,5 +8,11 @@ public class Constants {
 
     public interface BundleKeys {
         String ID = "com.udacity.myappportfolio." + "id";
+        String SORT_PREFERENCE = "com.udacity.myappportfolio." + "sort_preference";
+    }
+
+    public interface SortPreference {
+        int SORT_BY_POPULARITY = 1001;
+        int SORT_BY_VOTE_AVG = 1002;
     }
 }

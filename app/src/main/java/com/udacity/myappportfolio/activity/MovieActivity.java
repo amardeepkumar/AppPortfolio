@@ -12,6 +12,9 @@ import com.udacity.myappportfolio.adapter.MovieGalleryAdapter;
 import com.udacity.myappportfolio.databinding.ActivityMovieBinding;
 import com.udacity.myappportfolio.fragment.MovieDetailFragment;
 import com.udacity.myappportfolio.fragment.MovieGalleryFragment;
+import com.udacity.myappportfolio.network.Config;
+import com.udacity.myappportfolio.utility.Constants;
+import com.udacity.myappportfolio.utility.PreferenceManager;
 
 /**
  * Created by Amardeep on 18/2/16.
@@ -22,10 +25,6 @@ public class MovieActivity extends BaseActivity implements MovieGalleryAdapter.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /*setContentView(R.layout.activity_movie);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-*/
         ActivityMovieBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_movie);
         binding.toolbar.setTitle("Popular Movies");
         setSupportActionBar(binding.toolbar);
@@ -74,6 +73,18 @@ public class MovieActivity extends BaseActivity implements MovieGalleryAdapter.O
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
+                Constants.SortPreference.SORT_BY_POPULARITY) == Constants.SortPreference.SORT_BY_POPULARITY) {
+            menu.findItem(R.id.sort_by_popular).setChecked(true);
+        } else {
+            menu.findItem(R.id.sort_by_highest_rated).setChecked(true);
+        }
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override

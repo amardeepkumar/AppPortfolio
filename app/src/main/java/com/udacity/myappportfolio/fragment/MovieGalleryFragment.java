@@ -20,9 +20,11 @@ import com.udacity.myappportfolio.model.response.MovieResult;
 import com.udacity.myappportfolio.network.Config;
 import com.udacity.myappportfolio.network.NetworkManager;
 import com.udacity.myappportfolio.utility.CollectionUtils;
+import com.udacity.myappportfolio.utility.Constants;
 import com.udacity.myappportfolio.utility.DialogUtils;
 import com.udacity.myappportfolio.utility.KeyConstants;
 import com.udacity.myappportfolio.utility.NetworkUtil;
+import com.udacity.myappportfolio.utility.PreferenceManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,7 +43,6 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
     private int firstVisibleItem;
     private int mCurrentPage;
     private MovieGalleryAdapter.OnItemClickListener mItemClickListener;
-    private String mSortBy;
     private Callback<DiscoverMovieResponse> mCallBack = new Callback<DiscoverMovieResponse>() {
         @Override
         public void onResponse(Call<DiscoverMovieResponse> call, Response<DiscoverMovieResponse> response) {
@@ -80,12 +81,6 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
         setHasOptionsMenu(true);
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mSortBy = Config.UrlConstants.SORT_POPULARITY_DESC;
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -119,14 +114,16 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
         switch (item.getItemId()) {
             case R.id.sort_by_popular:
                 if (!item.isChecked()) {
-                    mSortBy = Config.UrlConstants.SORT_POPULARITY_DESC;
+                    PreferenceManager.getInstance().setInt(Constants.BundleKeys.SORT_PREFERENCE,
+                            Constants.SortPreference.SORT_BY_POPULARITY);
                     sortList(item);
                 }
                 return true;
 
             case R.id.sort_by_highest_rated:
                 if (!item.isChecked()) {
-                    mSortBy = Config.UrlConstants.SORT_VOTE_AVERAGE_DESC;
+                    PreferenceManager.getInstance().setInt(Constants.BundleKeys.SORT_PREFERENCE,
+                            Constants.SortPreference.SORT_BY_VOTE_AVG);
                     sortList(item);
                 }
                 return true;
@@ -140,7 +137,7 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
         item.setChecked(true);
         mCurrentPage = 0;
         loadMore(mCallBack);
-        ((MovieGalleryAdapter)binding.movieList.getAdapter()).resetSelection();
+        ((MovieGalleryAdapter) binding.movieList.getAdapter()).resetSelection();
     }
 
     private void loadMore(Callback<DiscoverMovieResponse> callBack) {
@@ -149,7 +146,16 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
             if (binding != null) {
                 binding.progressBar.setVisibility(View.VISIBLE);
             }
-            NetworkManager.requestMovies(mSortBy, KeyConstants.API_KEY, mCurrentPage + 1, callBack);
+
+            String sortBy;
+            if (PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
+                    Constants.SortPreference.SORT_BY_POPULARITY) == Constants.SortPreference.SORT_BY_POPULARITY) {
+                sortBy = Config.UrlConstants.SORT_POPULARITY_DESC;
+            } else {
+                sortBy = Config.UrlConstants.SORT_VOTE_AVERAGE_DESC;
+            }
+
+            NetworkManager.requestMovies(sortBy, KeyConstants.API_KEY, mCurrentPage + 1, callBack);
         } else {
             DialogUtils.showToast(R.string.no_network, mContext);
             if (binding != null) {
