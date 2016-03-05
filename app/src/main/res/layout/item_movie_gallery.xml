@@ -12,6 +12,7 @@
             type="com.udacity.myappportfolio.adapter.MovieGalleryAdapter.MovieGalleryViewHolder"/>
     </data>
     <ImageView
+        android:contentDescription="@string/movie_poster_image"
         android:background="@{data.selected ? @color/colorPrimary : @android:color/white}"
         android:padding="@dimen/dp_10"
         android:scaleType="fitXY"

@@ -12,11 +12,11 @@ import com.udacity.myappportfolio.adapter.MovieGalleryAdapter;
 import com.udacity.myappportfolio.databinding.ActivityMovieBinding;
 import com.udacity.myappportfolio.fragment.MovieDetailFragment;
 import com.udacity.myappportfolio.fragment.MovieGalleryFragment;
-import com.udacity.myappportfolio.network.Config;
 import com.udacity.myappportfolio.utility.Constants;
 import com.udacity.myappportfolio.utility.PreferenceManager;
 
 /**
+ * Class to show the Movie related UI
  * Created by Amardeep on 18/2/16.
  */
 public class MovieActivity extends BaseActivity implements MovieGalleryAdapter.OnItemClickListener {
@@ -26,7 +26,7 @@ public class MovieActivity extends BaseActivity implements MovieGalleryAdapter.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActivityMovieBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_movie);
-        binding.toolbar.setTitle("Popular Movies");
+        binding.toolbar.setTitle(R.string.popular_movies);
         setSupportActionBar(binding.toolbar);
 
         if (getResources().getBoolean(R.bool.isTablet)) {
@@ -47,11 +47,6 @@ public class MovieActivity extends BaseActivity implements MovieGalleryAdapter.O
     }
 
     @Override
-    public void onActionModeStarted(ActionMode mode) {
-        super.onActionModeStarted(mode);
-    }
-
-    @Override
     public void OnItemClicked(int movieId) {
         if (!getResources().getBoolean(R.bool.isTablet)) {
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
@@ -62,7 +57,7 @@ public class MovieActivity extends BaseActivity implements MovieGalleryAdapter.O
     }
 
     @Override
-    public void loadMovieDetail(int movieId) {
+    public void loadMovieDetailOnLaunch(int movieId) {
         if (mMovieDetailFragment != null) {
             mMovieDetailFragment.loadMovieDetails(movieId);
         }

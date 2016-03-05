@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -79,7 +78,7 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
             if (binding != null) {
                 binding.progressBar.setVisibility(View.VISIBLE);
             }
-            NetworkManager.requestMovieDetails(KeyConstants.API_KEY, mMovieId, this);
+            NetworkManager.requestMovieDetails(mMovieId, this);
         } else {
             DialogUtils.showToast(R.string.no_network, mContext);
             if (binding != null) {
@@ -98,7 +97,6 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
         if (response != null && response.isSuccess()
                 && response.body() != null) {
             binding.setData(response.body());
-            Log.d(TAG, "response = " + response);
             if (binding != null) {
                 binding.progressBar.setVisibility(View.GONE);
             }

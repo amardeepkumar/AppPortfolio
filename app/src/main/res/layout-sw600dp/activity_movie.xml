@@ -34,6 +34,7 @@
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:weightSum="1"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">

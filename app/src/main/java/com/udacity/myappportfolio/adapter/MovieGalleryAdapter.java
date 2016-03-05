@@ -26,7 +26,7 @@ public class MovieGalleryAdapter  extends RecyclerView.Adapter<MovieGalleryAdapt
 
     public interface OnItemClickListener {
         void OnItemClicked(int movieId);
-        void loadMovieDetail(int movieId);
+        void loadMovieDetailOnLaunch(int movieId);
     }
 
     private final LayoutInflater mLayoutInflater;
@@ -61,7 +61,7 @@ public class MovieGalleryAdapter  extends RecyclerView.Adapter<MovieGalleryAdapt
     }
 
     public void setMovieList(List<MovieResult> movieList) {
-        if (!CollectionUtils.isEmpty(movieList)) {
+        if (CollectionUtils.isEmpty(movieList)) {
             int positionStart = getItemCount() + 1;
             mMovieResult.addAll(movieList);
             notifyItemRangeInserted(positionStart, movieList.size());

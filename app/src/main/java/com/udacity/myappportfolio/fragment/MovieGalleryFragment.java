@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +21,6 @@ import com.udacity.myappportfolio.network.NetworkManager;
 import com.udacity.myappportfolio.utility.CollectionUtils;
 import com.udacity.myappportfolio.utility.Constants;
 import com.udacity.myappportfolio.utility.DialogUtils;
-import com.udacity.myappportfolio.utility.KeyConstants;
 import com.udacity.myappportfolio.utility.NetworkUtil;
 import com.udacity.myappportfolio.utility.PreferenceManager;
 
@@ -43,7 +41,7 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
     private int firstVisibleItem;
     private int mCurrentPage;
     private MovieGalleryAdapter.OnItemClickListener mItemClickListener;
-    private Callback<DiscoverMovieResponse> mCallBack = new Callback<DiscoverMovieResponse>() {
+    private final Callback<DiscoverMovieResponse> mCallBack = new Callback<DiscoverMovieResponse>() {
         @Override
         public void onResponse(Call<DiscoverMovieResponse> call, Response<DiscoverMovieResponse> response) {
             loading = false;
@@ -51,7 +49,6 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
                     && response.body() != null) {
                 mCurrentPage = response.body().getPage();
                 ((MovieGalleryAdapter) binding.movieList.getAdapter()).reSetMovieList(response.body().getResults());
-                Log.d(TAG, "response = " + response);
                 binding.progressBar.setVisibility(View.GONE);
             }
         }
@@ -140,6 +137,10 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
         ((MovieGalleryAdapter) binding.movieList.getAdapter()).resetSelection();
     }
 
+    /**
+     * Loading the movie list
+     * @param callBack
+     */
     private void loadMore(Callback<DiscoverMovieResponse> callBack) {
         if (NetworkUtil.isConnectionAvailable(mContext)) {
             loading = true;
@@ -155,7 +156,7 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
                 sortBy = Config.UrlConstants.SORT_VOTE_AVERAGE_DESC;
             }
 
-            NetworkManager.requestMovies(sortBy, KeyConstants.API_KEY, mCurrentPage + 1, callBack);
+            NetworkManager.requestMovies(sortBy, mCurrentPage + 1, callBack);
         } else {
             DialogUtils.showToast(R.string.no_network, mContext);
             if (binding != null) {
@@ -172,16 +173,15 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
             mCurrentPage = response.body().getPage();
 
             if (getResources().getBoolean(R.bool.isTablet)
-                    && !CollectionUtils.isEmpty(response.body().getResults())
+                    && CollectionUtils.isEmpty(response.body().getResults())
                     && mCurrentPage == 1) {
                 final MovieResult movieResult = response.body().getResults().get(0);
                 movieResult.setSelected(true);
                 final int movieId = movieResult.getId();
-                mItemClickListener.loadMovieDetail(movieId);
+                mItemClickListener.loadMovieDetailOnLaunch(movieId);
             }
             ((MovieGalleryAdapter) binding.movieList.getAdapter()).setMovieList(response.body().getResults());
 
-            Log.d(TAG, "response = " + response);
             if (binding != null) {
                 binding.progressBar.setVisibility(View.GONE);
             }
@@ -191,7 +191,7 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
     @Override
     public void onFailure(Call<DiscoverMovieResponse> call, Throwable t) {
         loading = false;
-        DialogUtils.showToast("response failed", mContext);
+        DialogUtils.showToast(R.string.response_failed, mContext);
         if (binding != null) {
             binding.progressBar.setVisibility(View.GONE);
         }
