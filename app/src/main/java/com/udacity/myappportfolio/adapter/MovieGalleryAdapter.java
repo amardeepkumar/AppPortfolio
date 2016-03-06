@@ -22,7 +22,7 @@ public class MovieGalleryAdapter  extends RecyclerView.Adapter<MovieGalleryAdapt
 
     private static final String TAG = MovieGalleryAdapter.class.getSimpleName();
     private final OnItemClickListener mOnItemClickListener;
-    private int previousSelection = 0;
+    private int previousSelection;
 
     public interface OnItemClickListener {
         void OnItemClicked(int movieId);

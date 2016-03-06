@@ -16,7 +16,6 @@ import com.udacity.myappportfolio.model.response.MovieDetailResponse;
 import com.udacity.myappportfolio.network.NetworkManager;
 import com.udacity.myappportfolio.utility.Constants;
 import com.udacity.myappportfolio.utility.DialogUtils;
-import com.udacity.myappportfolio.utility.KeyConstants;
 import com.udacity.myappportfolio.utility.NetworkUtil;
 
 import retrofit2.Call;

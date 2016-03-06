@@ -3,7 +3,6 @@ package com.udacity.myappportfolio.activity;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 
@@ -72,7 +71,12 @@ public class MovieActivity extends BaseActivity implements MovieGalleryAdapter.O
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
+        if (!getResources().getBoolean(R.bool.isTablet)
+                && getSupportFragmentManager().findFragmentById(R.id.fragment_container)instanceof MovieDetailFragment) {
+            //Hiding menu for detail fragment in case of phone
+            menu.findItem(R.id.sort_by_popular).setVisible(false);
+            menu.findItem(R.id.sort_by_highest_rated).setVisible(false);
+        } else if (PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
                 Constants.SortPreference.SORT_BY_POPULARITY) == Constants.SortPreference.SORT_BY_POPULARITY) {
             menu.findItem(R.id.sort_by_popular).setChecked(true);
         } else {

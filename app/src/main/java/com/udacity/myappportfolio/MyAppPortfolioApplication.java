@@ -1,6 +1,8 @@
-package com.udacity.myappportfolio.utility;
+package com.udacity.myappportfolio;
 
 import android.app.Application;
+
+import com.udacity.myappportfolio.utility.PreferenceManager;
 
 /**
  * Created by Amardeep on 4/3/16.
