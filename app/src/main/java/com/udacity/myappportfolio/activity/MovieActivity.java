@@ -25,7 +25,7 @@ public class MovieActivity extends BaseActivity implements MovieGalleryAdapter.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActivityMovieBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_movie);
-        binding.toolbar.setTitle(R.string.popular_movies);
+        binding.toolbar.setTitle(R.string.app_name);
         setSupportActionBar(binding.toolbar);
 
         if (getResources().getBoolean(R.bool.isTablet)) {
@@ -92,7 +92,7 @@ public class MovieActivity extends BaseActivity implements MovieGalleryAdapter.O
         if (!getResources().getBoolean(R.bool.isTablet)) {
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
-                actionBar.setTitle(R.string.popular_movies);
+                actionBar.setTitle(R.string.app_name);
                 actionBar.setDisplayHomeAsUpEnabled(false);
             }
         }

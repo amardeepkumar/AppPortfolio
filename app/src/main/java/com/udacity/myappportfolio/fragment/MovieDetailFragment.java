@@ -104,7 +104,7 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
 
     @Override
     public void onFailure(Call<MovieDetailResponse> call, Throwable t) {
-        DialogUtils.showToast("response failed", mContext);
+        DialogUtils.showToast(R.string.response_failed, mContext);
 
         if (binding != null) {
             binding.progressBar.setVisibility(View.GONE);

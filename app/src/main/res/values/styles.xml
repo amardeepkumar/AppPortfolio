@@ -16,25 +16,6 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="button_style_orange">
-        <item name="android:background">@drawable/orange_button_selector</item>
-        <item name="android:textColor">@android:color/black</item>
-    </style>
-
-    <style name="button_style_red">
-        <item name="android:background">@drawable/red_button_selector</item>
-        <item name="android:textColor">@android:color/white</item>
-    </style>
-
-    <style name="app_header_text_style">
-        <item name="android:textColor">@android:color/black</item>
-        <item name="android:textSize">@dimen/header_text_size</item>
-    </style>
-
-    <style name="CustomAppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <!--<item name="colorAccent">@color/color_5c267b</item>-->
-    </style>
-
     <style name="movie_name_style">
         <item name="android:background">@color/colorPrimary</item>
         <item name="android:textColor">@android:color/white</item>
@@ -46,5 +27,4 @@
         <item name="android:textSize">@dimen/sp_16</item>
     </style>
 
-    <dimen name="sp_16">16sp</dimen>
 </resources>
