@@ -1,11 +1,15 @@
 package com.udacity.myappportfolio.fragment;
 
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,6 +17,7 @@ import android.view.ViewGroup;
 
 import com.udacity.myappportfolio.R;
 import com.udacity.myappportfolio.adapter.MovieGalleryAdapter;
+import com.udacity.myappportfolio.data.MovieContract;
 import com.udacity.myappportfolio.databinding.FragmentMovieGalleryBinding;
 import com.udacity.myappportfolio.model.response.DiscoverMovieResponse;
 import com.udacity.myappportfolio.model.response.MovieResult;
@@ -41,6 +46,8 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
     private int firstVisibleItem;
     private int mCurrentPage;
     private MovieGalleryAdapter.OnItemClickListener mItemClickListener;
+
+    //Callback for reset adapter.
     private final Callback<DiscoverMovieResponse> mCallBack = new Callback<DiscoverMovieResponse>() {
         @Override
         public void onResponse(Call<DiscoverMovieResponse> call, Response<DiscoverMovieResponse> response) {
@@ -131,6 +138,29 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
     }
 
     private void sortList(MenuItem item) {
+
+/*
+
+        ContentValues locationValues = new ContentValues();
+
+        // Then add the data, along with the corresponding name of the data type,
+        // so the content provider knows what kind of value is being inserted.
+        locationValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, "12345");
+        locationValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, "New Movie");
+        locationValues.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE, "New Movie");
+        locationValues.put(MovieContract.MovieEntry.COLUMN_BACK_DROP_PATH, "New Movie");
+        locationValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, "New Movie");
+        locationValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, "New Movie");
+        locationValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, "New Movie");
+        locationValues.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, "New Movie");
+        locationValues.put(MovieContract.MovieEntry.COLUMN_IS_SELECTED, 1);
+
+
+        Uri insertedUri = mContext.getContentResolver().insert(
+                MovieContract.MovieEntry.CONTENT_URI,
+                locationValues);
+        long locationId = ContentUris.parseId(insertedUri);
+        Log.d(TAG, "movieId" + locationId);*/
         item.setChecked(true);
         mCurrentPage = 0;
         loadMore(mCallBack);

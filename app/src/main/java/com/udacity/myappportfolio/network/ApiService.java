@@ -2,6 +2,8 @@ package com.udacity.myappportfolio.network;
 
 import com.udacity.myappportfolio.model.response.DiscoverMovieResponse;
 import com.udacity.myappportfolio.model.response.MovieDetailResponse;
+import com.udacity.myappportfolio.model.response.MovieReviewResponse;
+import com.udacity.myappportfolio.model.response.MovieVideoResponse;
 
 import java.util.Map;
 
@@ -22,4 +24,12 @@ public interface ApiService {
     @GET("/3/movie/{id}")
     Call<MovieDetailResponse> requestMovieDetail(@Path(Config.UrlConstants.ID) int movieId,
                                                  @Query(Config.UrlConstants.API_KEY) String apiKey);
+
+    @GET("/3/movie/{id}/videos")
+    Call<MovieVideoResponse> requestMovieVideos(@Path(Config.UrlConstants.ID) int movieId,
+                                                @Query(Config.UrlConstants.API_KEY) String apiKey);
+
+    @GET("/3/movie/{id}/reviews")
+    Call<MovieReviewResponse> requestMovieReviews(@Path(Config.UrlConstants.ID) int movieId,
+                                                  @Query(Config.UrlConstants.API_KEY) String apiKey);
 }
