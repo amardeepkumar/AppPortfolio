@@ -11,6 +11,8 @@ import java.util.List;
 public class MovieResult extends BaseObservable {
     @Bindable
     private transient boolean selected;
+    @Bindable
+    private transient boolean favourite;
     @SerializedName("poster_path")
     private String posterPath;
     @SerializedName("adult")
@@ -47,6 +49,15 @@ public class MovieResult extends BaseObservable {
     public void setSelected(boolean isSelected) {
         this.selected = isSelected;
         notifyPropertyChanged(BR.selected);
+    }
+
+    public boolean isFavourite() {
+        return favourite;
+    }
+
+    public void setFavourite(boolean favourite) {
+        this.favourite = favourite;
+        notifyPropertyChanged(BR.favourite);
     }
 
     public String getPosterPath() {

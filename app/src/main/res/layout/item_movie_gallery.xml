@@ -9,7 +9,7 @@
 
         <variable
             name="clickHandler"
-            type="com.udacity.myappportfolio.adapter.MovieGalleryAdapter.MovieGalleryViewHolder"/>
+            type="com.udacity.myappportfolio.adapter.MovieGalleryCursorAdapter.MovieGalleryViewHolder"/>
     </data>
     <ImageView
         android:contentDescription="@string/movie_poster_image"
@@ -19,6 +19,5 @@
         android:id="@+id/image_view_item"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_260"
-        android:onClick="@{clickHandler.OnItemClicked}"
         app:imageUrl="@{data.posterPath ?? data.backdropPath}" />
 </layout>

@@ -8,6 +8,7 @@ import android.view.MenuInflater;
 
 import com.udacity.myappportfolio.R;
 import com.udacity.myappportfolio.adapter.MovieGalleryAdapter;
+import com.udacity.myappportfolio.adapter.MovieGalleryCursorAdapter;
 import com.udacity.myappportfolio.databinding.ActivityMovieBinding;
 import com.udacity.myappportfolio.fragment.MovieDetailFragment;
 import com.udacity.myappportfolio.fragment.MovieGalleryFragment;
@@ -18,7 +19,7 @@ import com.udacity.myappportfolio.utility.PreferenceManager;
  * Class to show the Movie related UI
  * Created by Amardeep on 18/2/16.
  */
-public class MovieActivity extends BaseActivity implements MovieGalleryAdapter.OnItemClickListener {
+public class MovieActivity extends BaseActivity implements MovieGalleryCursorAdapter.OnItemClickListener {
     private MovieDetailFragment mMovieDetailFragment;
 
     @Override

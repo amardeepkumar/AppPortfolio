@@ -2,9 +2,13 @@ package com.udacity.myappportfolio.fragment;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.udacity.myappportfolio.R;
-import com.udacity.myappportfolio.adapter.MovieGalleryAdapter;
+import com.udacity.myappportfolio.adapter.MovieGalleryCursorAdapter;
 import com.udacity.myappportfolio.data.CustomAsyncQueryHandler;
 import com.udacity.myappportfolio.data.MovieContract;
 import com.udacity.myappportfolio.databinding.FragmentMovieGalleryBinding;
@@ -28,6 +32,7 @@ import com.udacity.myappportfolio.utility.NetworkUtil;
 import com.udacity.myappportfolio.utility.PreferenceManager;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,28 +41,56 @@ import retrofit2.Response;
 /**
  * Created by Amardeep on 18/2/16.
  */
-public class MovieGalleryFragment extends BaseFragment implements Callback<DiscoverMovieResponse> {
+public class MovieGalleryFragment extends BaseFragment  implements LoaderManager.LoaderCallbacks<Cursor>,
+        Callback<DiscoverMovieResponse> {
 
     private static final String TAG = MovieGalleryFragment.class.getSimpleName();
+
+    // These indices are tied to MOVIE_PROJECTION.  If MOVIE_PROJECTION changes, these
+    // must change.
+    public static final int COLUMN_ID = 0;
+    public static final int COLUMN_MOVIE_ID = 1;
+    public static final int COLUMN_BACK_DROP_PATH = 2;
+    public static final int COLUMN_POSTER_PATH = 3;
+    public static final int COLUMN_FAVOURITE = 4;
+    public static final int COLUMN_IS_SELECTED = 5;
+
+    private static final String[] MOVIE_PROJECTION = {
+            MovieContract.MovieEntry._ID,
+            MovieContract.MovieEntry.COLUMN_MOVIE_ID,
+            MovieContract.MovieEntry.COLUMN_BACK_DROP_PATH,
+            MovieContract.MovieEntry.COLUMN_POSTER_PATH,
+            MovieContract.MovieEntry.COLUMN_FAVOURITE,
+            MovieContract.MovieEntry.COLUMN_IS_SELECTED
+    };
+
+    private static final int MOVIE_GALLERY_LOADER = 0;
+
     private FragmentMovieGalleryBinding binding;
     private boolean loading;
     private int visibleItemCount;
     private int totalItemCount;
     private int firstVisibleItem;
     private int mCurrentPage;
-    private MovieGalleryAdapter.OnItemClickListener mItemClickListener;
+    private MovieGalleryCursorAdapter.OnItemClickListener mItemClickListener;
 
     //Callback for reset adapter.
     private final Callback<DiscoverMovieResponse> mCallBack = new Callback<DiscoverMovieResponse>() {
         @Override
-        public void onResponse(Call<DiscoverMovieResponse> call, Response<DiscoverMovieResponse> response) {
-            loading = false;
-            if (response != null && response.isSuccess()
-                    && response.body() != null) {
-                mCurrentPage = response.body().getPage();
-                ((MovieGalleryAdapter) binding.movieList.getAdapter()).reSetMovieList(response.body().getResults());
-                binding.progressBar.setVisibility(View.GONE);
-            }
+        public void onResponse(Call<DiscoverMovieResponse> call, final Response<DiscoverMovieResponse> response) {
+            final AtomicInteger responseCount = new AtomicInteger(0);
+            CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(getActivity().getContentResolver());
+            queryHandler.setAsyncDeleteListener(new CustomAsyncQueryHandler.AsyncDeleteListener() {
+                @Override
+                public void onDeleteComplete(int token, Object cookie, int result) {
+                    if (responseCount.incrementAndGet() == 3) {
+                        saveDataAndUpdateUi(response);
+                    }
+                }
+            });
+            queryHandler.startDelete(2, null, MovieContract.MovieEntry.CONTENT_URI, null, null);
+            queryHandler.startDelete(3, null, MovieContract.VideoEntry.CONTENT_URI, null, null);
+            queryHandler.startDelete(4, null, MovieContract.ReviewEntry.CONTENT_URI, null, null);
         }
 
         @Override
@@ -72,7 +105,7 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            mItemClickListener = (MovieGalleryAdapter.OnItemClickListener) context;
+            mItemClickListener = (MovieGalleryCursorAdapter.OnItemClickListener) context;
         } catch (ClassCastException e) {
             throw new RuntimeException(context.toString()
                     + " must implement OnItemClickListener");
@@ -80,8 +113,15 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mCurrentPage = PreferenceManager.getInstance().getInt(Constants.BundleKeys.PAGE_NUMBER, 0);
+    }
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(MOVIE_GALLERY_LOADER, null, this);
         setHasOptionsMenu(true);
     }
 
@@ -91,7 +131,7 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie_gallery, container, false);
         final GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 2);
         binding.movieList.setLayoutManager(gridLayoutManager);
-        binding.movieList.setAdapter(new MovieGalleryAdapter(mContext, mItemClickListener));
+        binding.movieList.setAdapter(new MovieGalleryCursorAdapter(mContext, null, mItemClickListener));
         binding.movieList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -138,33 +178,10 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
     }
 
     private void sortList(MenuItem item) {
-
-/*
-
-        ContentValues locationValues = new ContentValues();
-
-        // Then add the data, along with the corresponding name of the data type,
-        // so the content provider knows what kind of value is being inserted.
-        locationValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, "12345");
-        locationValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, "New Movie");
-        locationValues.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE, "New Movie");
-        locationValues.put(MovieContract.MovieEntry.COLUMN_BACK_DROP_PATH, "New Movie");
-        locationValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, "New Movie");
-        locationValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, "New Movie");
-        locationValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, "New Movie");
-        locationValues.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, "New Movie");
-        locationValues.put(MovieContract.MovieEntry.COLUMN_IS_SELECTED, 1);
-
-
-        Uri insertedUri = mContext.getContentResolver().insert(
-                MovieContract.MovieEntry.CONTENT_URI,
-                locationValues);
-        long locationId = ContentUris.parseId(insertedUri);
-        Log.d(TAG, "movieId" + locationId);*/
         item.setChecked(true);
         mCurrentPage = 0;
+        PreferenceManager.getInstance().setInt(Constants.BundleKeys.PAGE_NUMBER, mCurrentPage);
         loadMore(mCallBack);
-        ((MovieGalleryAdapter) binding.movieList.getAdapter()).resetSelection();
     }
 
     /**
@@ -197,10 +214,24 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
 
     @Override
     public void onResponse(Call<DiscoverMovieResponse> call, Response<DiscoverMovieResponse> response) {
+        saveDataAndUpdateUi(response);
+    }
+
+    @Override
+    public void onFailure(Call<DiscoverMovieResponse> call, Throwable t) {
+        loading = false;
+        DialogUtils.showToast(R.string.response_failed, mContext);
+        if (binding != null) {
+            binding.progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    private void saveDataAndUpdateUi(Response<DiscoverMovieResponse> response) {
         loading = false;
         if (response != null && response.isSuccess()
                 && response.body() != null) {
             mCurrentPage = response.body().getPage();
+            PreferenceManager.getInstance().setInt(Constants.BundleKeys.PAGE_NUMBER, mCurrentPage);
 
             final List<MovieResult> results = response.body().getResults();
             if (getResources().getBoolean(R.bool.isTablet)
@@ -213,10 +244,19 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
             }
 
             CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(getActivity().getContentResolver());
+            queryHandler.setAsyncBulkInsertListener(new CustomAsyncQueryHandler.AsyncBulkInsertListener() {
+                @Override
+                public void onBulkInsertComplete(int token, Object cookie, int result) {
+//                    getLoaderManager().restartLoader(MOVIE_GALLERY_LOADER, null, MovieGalleryFragment.this);
+                    if (binding != null && binding.progressBar.getVisibility() == View.VISIBLE) {
+                        binding.progressBar.setVisibility(View.GONE);
+                    }
+                }
+            });
             ContentValues[] contentValues = new ContentValues[results.size()];
             int i = 0;
             for (MovieResult movieResult:
-                 results) {
+                    results) {
                 ContentValues contentValue = new ContentValues();
                 contentValue.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieResult.getId());
                 contentValue.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, movieResult.getPosterPath());
@@ -228,20 +268,6 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
                 contentValues[i++] = contentValue;
             }
             queryHandler.startBulkInsert(1, null, MovieContract.MovieEntry.CONTENT_URI, contentValues);
-            ((MovieGalleryAdapter) binding.movieList.getAdapter()).setMovieList(results);
-
-            if (binding != null) {
-                binding.progressBar.setVisibility(View.GONE);
-            }
-        }
-    }
-
-    @Override
-    public void onFailure(Call<DiscoverMovieResponse> call, Throwable t) {
-        loading = false;
-        DialogUtils.showToast(R.string.response_failed, mContext);
-        if (binding != null) {
-            binding.progressBar.setVisibility(View.GONE);
         }
     }
 
@@ -249,5 +275,36 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
     public void onDestroyView() {
         super.onDestroyView();
         binding.movieList.clearOnScrollListeners();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String sortOrder;
+        if (PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
+                Constants.SortPreference.SORT_BY_POPULARITY) == Constants.SortPreference.SORT_BY_POPULARITY) {
+            sortOrder = MovieContract.MovieEntry.COLUMN_POSTER_PATH + " DESC";
+        } else {
+            sortOrder = MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE + " DESC";
+        }
+
+        return new CursorLoader(getActivity(),
+                MovieContract.MovieEntry.CONTENT_URI,
+                MOVIE_PROJECTION,
+                null,
+                null,
+                sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (data.getCount() > 0) {
+            ((MovieGalleryCursorAdapter)binding.movieList.getAdapter()).swapCursor(data);
+            //binding.movieList.smoothScrollToPosition(0);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        ((MovieGalleryCursorAdapter)binding.movieList.getAdapter()).swapCursor(null);
     }
 }
