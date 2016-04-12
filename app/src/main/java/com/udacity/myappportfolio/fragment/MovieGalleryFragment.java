@@ -1,15 +1,12 @@
 package com.udacity.myappportfolio.fragment;
 
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +14,7 @@ import android.view.ViewGroup;
 
 import com.udacity.myappportfolio.R;
 import com.udacity.myappportfolio.adapter.MovieGalleryAdapter;
+import com.udacity.myappportfolio.data.CustomAsyncQueryHandler;
 import com.udacity.myappportfolio.data.MovieContract;
 import com.udacity.myappportfolio.databinding.FragmentMovieGalleryBinding;
 import com.udacity.myappportfolio.model.response.DiscoverMovieResponse;
@@ -28,6 +26,8 @@ import com.udacity.myappportfolio.utility.Constants;
 import com.udacity.myappportfolio.utility.DialogUtils;
 import com.udacity.myappportfolio.utility.NetworkUtil;
 import com.udacity.myappportfolio.utility.PreferenceManager;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -202,15 +202,33 @@ public class MovieGalleryFragment extends BaseFragment implements Callback<Disco
                 && response.body() != null) {
             mCurrentPage = response.body().getPage();
 
+            final List<MovieResult> results = response.body().getResults();
             if (getResources().getBoolean(R.bool.isTablet)
-                    && CollectionUtils.isEmpty(response.body().getResults())
+                    && CollectionUtils.hasItems(results)
                     && mCurrentPage == 1) {
-                final MovieResult movieResult = response.body().getResults().get(0);
+                final MovieResult movieResult = results.get(0);
                 movieResult.setSelected(true);
                 final int movieId = movieResult.getId();
                 mItemClickListener.loadMovieDetailOnLaunch(movieId);
             }
-            ((MovieGalleryAdapter) binding.movieList.getAdapter()).setMovieList(response.body().getResults());
+
+            CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(getActivity().getContentResolver());
+            ContentValues[] contentValues = new ContentValues[results.size()];
+            int i = 0;
+            for (MovieResult movieResult:
+                 results) {
+                ContentValues contentValue = new ContentValues();
+                contentValue.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieResult.getId());
+                contentValue.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, movieResult.getPosterPath());
+                contentValue.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE, movieResult.getOriginalTitle());
+                contentValue.put(MovieContract.MovieEntry.COLUMN_BACK_DROP_PATH, movieResult.getBackdropPath());
+                contentValue.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movieResult.getReleaseDate());
+                contentValue.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, movieResult.getVoteAverage());
+                contentValue.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, movieResult.getOverview());
+                contentValues[i++] = contentValue;
+            }
+            queryHandler.startBulkInsert(1, null, MovieContract.MovieEntry.CONTENT_URI, contentValues);
+            ((MovieGalleryAdapter) binding.movieList.getAdapter()).setMovieList(results);
 
             if (binding != null) {
                 binding.progressBar.setVisibility(View.GONE);

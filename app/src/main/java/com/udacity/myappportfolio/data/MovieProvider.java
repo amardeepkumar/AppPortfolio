@@ -191,7 +191,7 @@ public class MovieProvider extends ContentProvider {
 
         switch (match) {
             case MOVIE: {
-                long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, "", values);
+                long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
                     returnUri = MovieContract.MovieEntry.buildMovieUri(_id);
                 else
@@ -199,7 +199,7 @@ public class MovieProvider extends ContentProvider {
                 break;
             }
             case VIDEO: {
-                long _id = db.insert(MovieContract.VideoEntry.TABLE_NAME, "", values);
+                long _id = db.insert(MovieContract.VideoEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
                     returnUri = MovieContract.VideoEntry.buildVideoUri(_id);
                 else
@@ -207,7 +207,7 @@ public class MovieProvider extends ContentProvider {
                 break;
             }
             case REVIEW: {
-                long _id = db.insert(MovieContract.ReviewEntry.TABLE_NAME, "", values);
+                long _id = db.insert(MovieContract.ReviewEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
                     returnUri = MovieContract.ReviewEntry.buildReviewUri(_id);
                 else
@@ -227,7 +227,9 @@ public class MovieProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         int rowsDeleted;
         // this makes delete all rows return the number of rows deleted
-        if ( null == selection ) selection = "1";
+        if (null == selection) {
+            selection = "1";
+        }
         switch (match) {
             case MOVIE:
                 rowsDeleted = db.delete(
@@ -236,6 +238,7 @@ public class MovieProvider extends ContentProvider {
             case VIDEO:
                 rowsDeleted = db.delete(
                         MovieContract.VideoEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             case REVIEW:
                 rowsDeleted = db.delete(
                         MovieContract.ReviewEntry.TABLE_NAME, selection, selectionArgs);
@@ -251,8 +254,7 @@ public class MovieProvider extends ContentProvider {
     }
 
     @Override
-    public int update(
-            Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         int rowsUpdated;
@@ -335,9 +337,6 @@ public class MovieProvider extends ContentProvider {
         }
     }
 
-    // You do not need to call this method. This is a method specifically to assist the testing
-    // framework in running smoothly. You can read more at:
-    // http://developer.android.com/reference/android/content/ContentProvider.html#shutdown()
     @Override
     @TargetApi(11)
     public void shutdown() {

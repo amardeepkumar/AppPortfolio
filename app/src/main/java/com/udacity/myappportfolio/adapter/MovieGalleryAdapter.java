@@ -61,7 +61,7 @@ public class MovieGalleryAdapter  extends RecyclerView.Adapter<MovieGalleryAdapt
     }
 
     public void setMovieList(List<MovieResult> movieList) {
-        if (CollectionUtils.isEmpty(movieList)) {
+        if (CollectionUtils.hasItems(movieList)) {
             int positionStart = getItemCount() + 1;
             mMovieResult.addAll(movieList);
             notifyItemRangeInserted(positionStart, movieList.size());

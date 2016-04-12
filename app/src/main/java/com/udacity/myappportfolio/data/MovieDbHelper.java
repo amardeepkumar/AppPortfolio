@@ -37,21 +37,21 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         final String SQL_CREATE_MOVIE_TABLE = "CREATE TABLE IF NOT EXISTS " + MovieContract.MovieEntry.TABLE_NAME + " (" +
                 MovieContract.MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                MovieContract.MovieEntry.COLUMN_MOVIE_ID + " TEXT UNIQUE NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_BACK_DROP_PATH + " TEXT NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE + " TEXT NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_FAVOURITE + " INTEGER NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_IS_SELECTED + " TEXT NOT NULL " +
+                MovieContract.MovieEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL ON CONFLICT REPLACE, " +
+                MovieContract.MovieEntry.COLUMN_POSTER_PATH + " TEXT, " +
+                MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE + " TEXT, " +
+                MovieContract.MovieEntry.COLUMN_BACK_DROP_PATH + " TEXT, " +
+                MovieContract.MovieEntry.COLUMN_RELEASE_DATE + " TEXT, " +
+                MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE + " REAL DEFAULT 0.0, " +
+                MovieContract.MovieEntry.COLUMN_OVERVIEW + " TEXT, " +
+                MovieContract.MovieEntry.COLUMN_FAVOURITE + " INTEGER DEFAULT 0, " +
+                MovieContract.MovieEntry.COLUMN_IS_SELECTED + " INTEGER DEFAULT 0 " +
                 " );";
 
 
         final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE IF NOT EXISTS " + MovieContract.VideoEntry.TABLE_NAME + " (" +
                 MovieContract.VideoEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                MovieContract.VideoEntry.COLUMN_VIDEO_ID + " TEXT UNIQUE NOT NULL, " +
+                MovieContract.VideoEntry.COLUMN_VIDEO_ID + " TEXT UNIQUE NOT NULL ON CONFLICT REPLACE, " +
                 MovieContract.VideoEntry.COLUMN_VIDEO_KEY + " TEXT NOT NULL, " +
                 MovieContract.VideoEntry.COLUMN_VIDEO_NAME + " TEXT NOT NULL, " +
                 MovieContract.VideoEntry.COLUMN_MOVIE_ID + " TEXT NOT NULL, " +
@@ -62,9 +62,9 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_REVIEW_TABLE = "CREATE TABLE IF NOT EXISTS " + MovieContract.ReviewEntry.TABLE_NAME + " (" +
                 MovieContract.ReviewEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                MovieContract.ReviewEntry.COLUMN_REVIEW_ID + " TEXT UNIQUE NOT NULL, " +
-                MovieContract.ReviewEntry.COLUMN_AUTHOR + " TEXT NOT NULL, " +
-                MovieContract.ReviewEntry.COLUMN_CONTENT + " TEXT NOT NULL, " +
+                MovieContract.ReviewEntry.COLUMN_REVIEW_ID + " TEXT UNIQUE NOT NULL ON CONFLICT REPLACE, " +
+                MovieContract.ReviewEntry.COLUMN_AUTHOR + " TEXT, " +
+                MovieContract.ReviewEntry.COLUMN_CONTENT + " TEXT, " +
                 MovieContract.ReviewEntry.COLUMN_URL + " TEXT NOT NULL, " +
                 MovieContract.ReviewEntry.COLUMN_MOVIE_ID + " TEXT NOT NULL, " +
                 // Set up the review column as a foreign key to movie table.
