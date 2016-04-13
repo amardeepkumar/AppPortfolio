@@ -17,7 +17,7 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
 
     private Context mContext;
 
-    private Cursor mCursor;
+    protected Cursor mCursor;
 
     private boolean mDataValid;
 

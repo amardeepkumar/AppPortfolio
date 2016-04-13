@@ -1,5 +1,6 @@
 package com.udacity.myappportfolio.adapter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
@@ -9,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.udacity.myappportfolio.R;
+import com.udacity.myappportfolio.data.CustomAsyncQueryHandler;
+import com.udacity.myappportfolio.data.MovieContract;
 import com.udacity.myappportfolio.databinding.ItemMovieGalleryBinding;
 import com.udacity.myappportfolio.fragment.MovieGalleryFragment;
 import com.udacity.myappportfolio.model.response.MovieResult;
@@ -61,20 +64,6 @@ public class MovieGalleryCursorAdapter extends CursorRecyclerViewAdapter<MovieGa
         return movie;
     }
 
-    /*public void reSetMovieList(List<MovieResult> movieList) {
-        mMovieResult.clear();
-        mMovieResult.addAll(movieList);
-        notifyDataSetChanged();
-    }
-
-    public void setMovieList(List<MovieResult> movieList) {
-        if (CollectionUtils.hasItems(movieList)) {
-            int positionStart = getItemCount() + 1;
-            mMovieResult.addAll(movieList);
-            notifyItemRangeInserted(positionStart, movieList.size());
-        }
-    }*/
-
     public class MovieGalleryViewHolder extends RecyclerView.ViewHolder {
 
         private final ItemMovieGalleryBinding mItemBinding;
@@ -85,20 +74,32 @@ public class MovieGalleryCursorAdapter extends CursorRecyclerViewAdapter<MovieGa
         }
 
         public void bindItem(MovieResult movieResult) {
-            //mItemBinding.setClickHandler(this);
+            mItemBinding.setClickHandler(this);
             mItemBinding.setData(movieResult);
         }
 
-        /*public void OnItemClicked(View view) {
-            final int adapterPosition = getAdapterPosition();
+        public void OnItemClicked(View view) {
+            /*final int adapterPosition = getAdapterPosition();
             if (previousSelection != adapterPosition) {
                 mMovieResult.get(previousSelection).setSelected(false);
             }
             MovieResult movie = mMovieResult.get(adapterPosition);
             movie.setSelected(true);
             mOnItemClickListener.OnItemClicked(movie.getId());
-            previousSelection = adapterPosition;
-        }*/
+            previousSelection = adapterPosition;*/
+        }
+
+        public void OnFavouriteClicked(View view) {
+            if (mCursor != null && mCursor.moveToPosition(getAdapterPosition())) {
+                CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(view.getContext().getContentResolver());
+                ContentValues values = new ContentValues();
+                values.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, mCursor.getInt(MovieGalleryFragment.COLUMN_FAVOURITE) == 0 ? 1 : 0);
+
+                queryHandler.startUpdate(1, null, MovieContract.MovieEntry.CONTENT_URI,
+                        values, MovieContract.MovieEntry._ID + " = ?",
+                        new String[]{mCursor.getString(MovieGalleryFragment.COLUMN_ID)});
+            }
+        }
     }
 
     public void resetSelection() {

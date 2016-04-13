@@ -3,21 +3,40 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <variable
             name="data"
             type="com.udacity.myappportfolio.model.response.MovieResult" />
 
         <variable
             name="clickHandler"
-            type="com.udacity.myappportfolio.adapter.MovieGalleryCursorAdapter.MovieGalleryViewHolder"/>
+            type="com.udacity.myappportfolio.adapter.MovieGalleryCursorAdapter.MovieGalleryViewHolder" />
     </data>
-    <ImageView
-        android:contentDescription="@string/movie_poster_image"
-        android:background="@{data.selected ? @color/colorPrimary : @android:color/white}"
-        android:padding="@dimen/dp_10"
-        android:scaleType="fitXY"
-        android:id="@+id/image_view_item"
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_260"
-        app:imageUrl="@{data.posterPath ?? data.backdropPath}" />
+        android:onClick="@{clickHandler.OnItemClicked}">
+
+        <ImageView
+            android:id="@+id/image_view_item"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@{data.selected ? @color/colorPrimary : @android:color/white}"
+            android:contentDescription="@string/movie_poster_image"
+            android:padding="@dimen/dp_10"
+            android:scaleType="fitXY"
+            app:imageUrl="@{data.posterPath ?? data.backdropPath}" />
+
+        <ImageView
+            android:background="@android:color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:onClick="@{clickHandler.OnFavouriteClicked}"
+            android:padding="@dimen/dp_10"
+            android:src="@{data.favourite ? @drawable/your_wish_list_1 : @drawable/your_wish_list}" />
+
+    </RelativeLayout>
 </layout>
