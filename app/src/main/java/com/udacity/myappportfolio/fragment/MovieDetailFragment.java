@@ -28,13 +28,13 @@ import retrofit2.Response;
 public class MovieDetailFragment extends BaseFragment implements Callback<MovieDetailResponse> {
 
     private static final String TAG = MovieDetailFragment.class.getSimpleName();
-    private int mMovieId;
+    private String mMovieId;
     private FragmentMovieDetailBinding binding;
 
-    public static MovieDetailFragment getInstance(int movieId) {
+    public static MovieDetailFragment getInstance(String movieId) {
         MovieDetailFragment fragment = new MovieDetailFragment();
         Bundle args = new Bundle();
-        args.putInt(Constants.BundleKeys.ID, movieId);
+        args.putString(Constants.BundleKeys.ID, movieId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -50,7 +50,7 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mMovieId = getArguments().getInt(Constants.BundleKeys.ID, 0);
+            mMovieId = getArguments().getString(Constants.BundleKeys.ID, null);
         }
 
         if (!getResources().getBoolean(R.bool.isTablet)) {
@@ -68,7 +68,10 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie_detail, container, false);
 
-        loadMovieDetails();
+        if (mMovieId != null) {
+            loadMovieDetails();
+        }
+
         return binding.getRoot();
     }
 
@@ -86,7 +89,7 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
         }
     }
 
-    public void loadMovieDetails(int movieId) {
+    public void loadMovieDetails(String movieId) {
         mMovieId = movieId;
         loadMovieDetails();
     }

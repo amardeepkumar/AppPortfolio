@@ -25,7 +25,6 @@ import com.udacity.myappportfolio.model.response.DiscoverMovieResponse;
 import com.udacity.myappportfolio.model.response.MovieResult;
 import com.udacity.myappportfolio.network.Config;
 import com.udacity.myappportfolio.network.NetworkManager;
-import com.udacity.myappportfolio.utility.CollectionUtils;
 import com.udacity.myappportfolio.utility.Constants;
 import com.udacity.myappportfolio.utility.DialogUtils;
 import com.udacity.myappportfolio.utility.NetworkUtil;
@@ -244,20 +243,11 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
             PreferenceManager.getInstance().setInt(Constants.BundleKeys.PAGE_NUMBER, mCurrentPage);
 
             final List<MovieResult> results = response.body().getResults();
-            if (getResources().getBoolean(R.bool.isTablet)
-                    && CollectionUtils.hasItems(results)
-                    && mCurrentPage == 1) {
-                final MovieResult movieResult = results.get(0);
-                movieResult.setSelected(true);
-                final int movieId = movieResult.getId();
-                mItemClickListener.loadMovieDetailOnLaunch(movieId);
-            }
 
             CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(getActivity().getContentResolver());
             queryHandler.setAsyncBulkInsertListener(new CustomAsyncQueryHandler.AsyncBulkInsertListener() {
                 @Override
                 public void onBulkInsertComplete(int token, Object cookie, int result) {
-//                    getLoaderManager().restartLoader(MOVIE_GALLERY_LOADER, null, MovieGalleryFragment.this);
                     if (binding != null && binding.progressBar.getVisibility() == View.VISIBLE) {
                         binding.progressBar.setVisibility(View.GONE);
                     }
@@ -292,12 +282,6 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
         String sortOrder = null;
         switch (PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
                 Constants.SortPreference.SORT_BY_POPULARITY)) {
-            /*case Constants.SortPreference.SORT_BY_POPULARITY:
-                sortOrder = MovieContract.MovieEntry.COLUMN_POSTER_PATH + " DESC";
-                break;
-            case Constants.SortPreference.SORT_BY_VOTE_AVG:
-                sortOrder = MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE + " DESC";
-                break;*/
             case Constants.SortPreference.SORT_BY_FAVOURITE:
                 sortOrder = MovieContract.MovieEntry.COLUMN_FAVOURITE + " DESC";
                 break;
@@ -316,7 +300,6 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data.getCount() > 0) {
             ((MovieGalleryCursorAdapter)binding.movieList.getAdapter()).swapCursor(data);
-            //binding.movieList.smoothScrollToPosition(0);
         }
     }
 

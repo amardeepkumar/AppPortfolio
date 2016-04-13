@@ -24,7 +24,7 @@ public class MovieResult extends BaseObservable {
     @SerializedName("genre_ids")
     private List<Integer> mGenreIds;
     @SerializedName("id")
-    private int mId;
+    private String mId;
     @SerializedName("original_title")
     private String mOriginalTitle;
     @SerializedName("original_language")
@@ -100,11 +100,11 @@ public class MovieResult extends BaseObservable {
         this.mGenreIds = mGenreIds;
     }
 
-    public int getId() {
+    public String getId() {
         return mId;
     }
 
-    public void setId(int mId) {
+    public void setId(String mId) {
         this.mId = mId;
     }
 

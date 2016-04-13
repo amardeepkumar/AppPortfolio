@@ -4,16 +4,21 @@ package com.udacity.myappportfolio.data;
  * Created by Amardeep on 11/4/16.
  */
 
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.os.RemoteException;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 public abstract class AsyncQueryHandler extends Handler {
     private static final int EVENT_ARG_QUERY = 1;
@@ -21,6 +26,7 @@ public abstract class AsyncQueryHandler extends Handler {
     private static final int EVENT_ARG_UPDATE = 3;
     private static final int EVENT_ARG_DELETE = 4;
     private static final int EVENT_ARG_BULK_INSERT = 5;
+    private static final int EVENT_ARG_APPLY_BATCH = 6;
 
     private final WeakReference<ContentResolver> mResolver;
     private static Looper sLooper = null;
@@ -36,6 +42,8 @@ public abstract class AsyncQueryHandler extends Handler {
         public Object result;
         public Object cookie;
         public ContentValues[] values;
+        public ArrayList<ContentProviderOperation> ops;
+        public String authority;
     }
 
     protected class WorkerHandler extends Handler {
@@ -88,6 +96,14 @@ public abstract class AsyncQueryHandler extends Handler {
                 case EVENT_ARG_DELETE:
                     args.result = resolver.delete(args.uri, args.selection, args.selectionArgs);
                     break;
+                case EVENT_ARG_APPLY_BATCH:
+                    try {
+                        args.result = resolver.applyBatch(args.authority, args.ops);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    } catch (OperationApplicationException e) {
+                        e.printStackTrace();
+                    }
             }
 
             // passing the original token value back to the caller
@@ -284,6 +300,36 @@ public abstract class AsyncQueryHandler extends Handler {
     }
 
     /**
+     * This method begins an asynchronous delete. When the delete operation is
+     * done {@link #onDeleteComplete} is called.
+     *
+     * @param token
+     *            A token passed into {@link #onDeleteComplete} to identify the
+     *            delete operation.
+     * @param cookie
+     *            An object that gets passed into {@link #onDeleteComplete}
+     * @param authority
+     *            the authority passed to the applyBatch operation.
+     * @param operations
+     *            the operations to apply.
+     */
+    public final void applyBatch(int token, Object cookie, String authority,
+                                 ArrayList<ContentProviderOperation> operations) {
+        // Use the token as what so cancelOperations works properly
+        Message msg = mWorkerThreadHandler.obtainMessage(token);
+        msg.arg1 = EVENT_ARG_APPLY_BATCH;
+
+        WorkerArgs args = new WorkerArgs();
+        args.handler = this;
+        args.authority = authority;
+        args.cookie = cookie;
+        args.ops = operations;
+        msg.obj = args;
+
+        mWorkerThreadHandler.sendMessage(msg);
+    }
+
+    /**
      * Called when an asynchronous query is completed.
      *
      * @param token
@@ -342,6 +388,20 @@ public abstract class AsyncQueryHandler extends Handler {
     protected void onDeleteComplete(int token, Object cookie, int result) {
     }
 
+    /**
+     * Called when an asynchronous applyBatch is completed.
+     *
+     * @param token
+     *            the token to identify the query, passed in from
+     *            {@link #applyBatch}.
+     * @param cookie
+     *            the cookie object that's passed in from {@link #applyBatch}.
+     * @param result
+     *            the result returned from the delete operation
+     */
+    protected void onApplyBatchComplete(int token, Object cookie, ContentProviderResult[] result) {
+    }
+
     @Override
     public void handleMessage(Message msg) {
         WorkerArgs args = (WorkerArgs) msg.obj;
@@ -369,6 +429,11 @@ public abstract class AsyncQueryHandler extends Handler {
             case EVENT_ARG_DELETE:
                 onDeleteComplete(token, args.cookie, (Integer) args.result);
                 break;
+
+            case EVENT_ARG_APPLY_BATCH:
+                onApplyBatchComplete(token, args.cookie, (ContentProviderResult[]) args.result);
+                break;
+
         }
     }
 }

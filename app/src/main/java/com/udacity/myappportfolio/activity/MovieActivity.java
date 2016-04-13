@@ -46,18 +46,11 @@ public class MovieActivity extends BaseActivity implements MovieGalleryCursorAda
     }
 
     @Override
-    public void OnItemClicked(int movieId) {
+    public void OnItemClicked(String movieId) {
         if (!getResources().getBoolean(R.bool.isTablet)) {
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
                     MovieDetailFragment.getInstance(movieId)).addToBackStack(null).commit();
         } else if (mMovieDetailFragment != null) {
-            mMovieDetailFragment.loadMovieDetails(movieId);
-        }
-    }
-
-    @Override
-    public void loadMovieDetailOnLaunch(int movieId) {
-        if (mMovieDetailFragment != null) {
             mMovieDetailFragment.loadMovieDetails(movieId);
         }
     }

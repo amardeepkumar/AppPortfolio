@@ -1,5 +1,6 @@
 package com.udacity.myappportfolio.data;
 
+import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -14,6 +15,8 @@ public class CustomAsyncQueryHandler extends AsyncQueryHandler {
     private WeakReference<AsyncQueryListener> mListener;
     private WeakReference<AsyncBulkInsertListener> mBulkInsertListener;
     private WeakReference<AsyncDeleteListener> mDeleteListener;
+    private WeakReference<AsyncUpdateListener> mUpdateListener;
+    private WeakReference<AsyncApplyBatchListener> mApplyBatchListener;
 
     public interface AsyncQueryListener {
         void onQueryComplete(int token, Object cookie, Cursor cursor);
@@ -25,6 +28,14 @@ public class CustomAsyncQueryHandler extends AsyncQueryHandler {
 
     public interface AsyncDeleteListener {
         void onDeleteComplete(int token, Object cookie, int result);
+    }
+
+    public interface AsyncUpdateListener {
+        void onUpdateComplete(int token, Object cookie, int result);
+    }
+
+    public interface AsyncApplyBatchListener {
+        void onApplyBatchComplete(int token, Object cookie, ContentProviderResult[] result);
     }
 
     public CustomAsyncQueryHandler(ContentResolver cr) {
@@ -53,6 +64,22 @@ public class CustomAsyncQueryHandler extends AsyncQueryHandler {
      */
     public void setAsyncDeleteListener(AsyncDeleteListener listener) {
         mDeleteListener = new WeakReference<>(listener);
+    }
+
+    /**
+     * Assign the given {@link AsyncUpdateListener} to receive query events from
+     * asynchronous calls. Will replace any existing listener.
+     */
+    public void setAsyncUpdateListener(AsyncUpdateListener listener) {
+        mUpdateListener = new WeakReference<>(listener);
+    }
+
+    /**
+     * Assign the given {@link AsyncApplyBatchListener} to receive query events from
+     * asynchronous calls. Will replace any existing listener.
+     */
+    public void setAsyncApplyBatchListener(AsyncApplyBatchListener listener) {
+        mApplyBatchListener = new WeakReference<>(listener);
     }
 
     @Override
@@ -88,6 +115,17 @@ public class CustomAsyncQueryHandler extends AsyncQueryHandler {
 
     @Override
     protected void onUpdateComplete(int token, Object cookie, int result) {
-        super.onUpdateComplete(token, cookie, result);
+        final AsyncUpdateListener listener = mUpdateListener.get();
+        if (listener != null) {
+            listener.onUpdateComplete(token, cookie, result);
+        }
+    }
+
+    @Override
+    protected void onApplyBatchComplete(int token, Object cookie, ContentProviderResult[] result) {
+        final AsyncApplyBatchListener listener = mApplyBatchListener.get();
+        if (listener != null) {
+            listener.onApplyBatchComplete(token, cookie, result);
+        }
     }
 }

@@ -32,10 +32,10 @@
                 android:visibility="@{data != null ? View.VISIBLE: View.GONE}">
 
                 <ImageView
-                    android:contentDescription="@string/movie_detail_image"
                     android:id="@+id/poster_image"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/dp_260"
+                    android:contentDescription="@string/movie_detail_image"
                     android:scaleType="fitXY"
                     app:imageUrl="@{data.posterPath ?? data.backdropPath}" />
 
@@ -82,6 +82,7 @@
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:visibility="gone" />
     </FrameLayout>
 </layout>

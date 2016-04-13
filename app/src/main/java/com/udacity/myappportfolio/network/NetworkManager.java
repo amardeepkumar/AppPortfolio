@@ -49,7 +49,7 @@ public class NetworkManager {
         model.enqueue(callback);
     }
 
-    public static void requestMovieDetails(int movieId, Callback<MovieDetailResponse> callback) {
+    public static void requestMovieDetails(String movieId, Callback<MovieDetailResponse> callback) {
         ApiService service = getApiService();
         Call<MovieDetailResponse> model = service.requestMovieDetail(movieId, KeyConstants.API_KEY);
         model.enqueue(callback);

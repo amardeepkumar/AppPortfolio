@@ -1,5 +1,7 @@
 package com.udacity.myappportfolio.adapter;
 
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -15,10 +17,8 @@ import com.udacity.myappportfolio.data.MovieContract;
 import com.udacity.myappportfolio.databinding.ItemMovieGalleryBinding;
 import com.udacity.myappportfolio.fragment.MovieGalleryFragment;
 import com.udacity.myappportfolio.model.response.MovieResult;
-import com.udacity.myappportfolio.utility.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Amardeep on 23/2/16.
@@ -33,12 +33,12 @@ public class MovieGalleryCursorAdapter extends CursorRecyclerViewAdapter<MovieGa
         super(context, cursor);
         mOnItemClickListener = itemClickListener;
         mLayoutInflater = LayoutInflater.from(context);
+        previousSelection = -2;//Setting to a non reachable cursor position
     }
 
 
     public interface OnItemClickListener {
-        void OnItemClicked(int movieId);
-        void loadMovieDetailOnLaunch(int movieId);
+        void OnItemClicked(String movieId);
     }
 
     private final LayoutInflater mLayoutInflater;
@@ -56,7 +56,7 @@ public class MovieGalleryCursorAdapter extends CursorRecyclerViewAdapter<MovieGa
 
     private MovieResult getMovieResultFromCursor(Cursor cursor) {
         MovieResult movie = new MovieResult();
-        movie.setId(cursor.getInt(MovieGalleryFragment.COLUMN_MOVIE_ID));
+        movie.setId(cursor.getString(MovieGalleryFragment.COLUMN_MOVIE_ID));
         movie.setBackdropPath(cursor.getString(MovieGalleryFragment.COLUMN_BACK_DROP_PATH));
         movie.setPosterPath(cursor.getString(MovieGalleryFragment.COLUMN_POSTER_PATH));
         movie.setFavourite(cursor.getInt(MovieGalleryFragment.COLUMN_FAVOURITE) > 0);
@@ -79,14 +79,46 @@ public class MovieGalleryCursorAdapter extends CursorRecyclerViewAdapter<MovieGa
         }
 
         public void OnItemClicked(View view) {
-            /*final int adapterPosition = getAdapterPosition();
-            if (previousSelection != adapterPosition) {
-                mMovieResult.get(previousSelection).setSelected(false);
+            final int adapterPosition = getAdapterPosition();
+
+            if (mCursor != null && mCursor.moveToPosition(adapterPosition)) {
+                final String movieId = mCursor.getString(MovieGalleryFragment.COLUMN_MOVIE_ID);
+                final String rowId = mCursor.getString(MovieGalleryFragment.COLUMN_ID);
+
+                //Check for previous selection.
+                if (previousSelection != adapterPosition) {
+                    CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(view.getContext().getContentResolver());
+
+                    //Setting the selection to clicked item
+                    ContentValues values = new ContentValues();
+                    values.put(MovieContract.MovieEntry.COLUMN_IS_SELECTED, 1);
+
+                    queryHandler.setAsyncApplyBatchListener(new CustomAsyncQueryHandler.AsyncApplyBatchListener() {
+                        @Override
+                        public void onApplyBatchComplete(int token, Object cookie, ContentProviderResult[] result) {
+                            mOnItemClickListener.OnItemClicked(movieId);
+                        }
+                    });
+
+                    ArrayList<ContentProviderOperation> ops = new ArrayList<>();
+                    ops.add(ContentProviderOperation.newUpdate(MovieContract.MovieEntry.CONTENT_URI)
+                                    .withSelection(MovieContract.MovieEntry._ID + " = ?",
+                                            new String[]{rowId})
+                                    .withValue(MovieContract.MovieEntry.COLUMN_IS_SELECTED, 1)
+                                    .build());
+                    if (mCursor.moveToPosition(previousSelection)) {
+                        ops.add(ContentProviderOperation.newUpdate(MovieContract.MovieEntry.CONTENT_URI)
+                                .withSelection(MovieContract.MovieEntry._ID + " = ?",
+                                        new String[]{mCursor.getString(MovieGalleryFragment.COLUMN_ID)})
+                                .withValue(MovieContract.MovieEntry.COLUMN_IS_SELECTED, 0)
+                                .build());
+                    }
+
+
+                    queryHandler.applyBatch(1, null, MovieContract.CONTENT_AUTHORITY, ops);
+                }
+                previousSelection = adapterPosition;
             }
-            MovieResult movie = mMovieResult.get(adapterPosition);
-            movie.setSelected(true);
-            mOnItemClickListener.OnItemClicked(movie.getId());
-            previousSelection = adapterPosition;*/
         }
 
         public void OnFavouriteClicked(View view) {
@@ -100,9 +132,5 @@ public class MovieGalleryCursorAdapter extends CursorRecyclerViewAdapter<MovieGa
                         new String[]{mCursor.getString(MovieGalleryFragment.COLUMN_ID)});
             }
         }
-    }
-
-    public void resetSelection() {
-        previousSelection = 0;
     }
 }
