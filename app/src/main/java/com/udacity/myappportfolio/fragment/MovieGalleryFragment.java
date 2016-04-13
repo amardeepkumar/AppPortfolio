@@ -160,6 +160,7 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
                 if (!item.isChecked()) {
                     PreferenceManager.getInstance().setInt(Constants.BundleKeys.SORT_PREFERENCE,
                             Constants.SortPreference.SORT_BY_POPULARITY);
+                    getLoaderManager().restartLoader(MOVIE_GALLERY_LOADER, null, this);
                     sortList(item);
                 }
                 return true;
@@ -168,7 +169,16 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
                 if (!item.isChecked()) {
                     PreferenceManager.getInstance().setInt(Constants.BundleKeys.SORT_PREFERENCE,
                             Constants.SortPreference.SORT_BY_VOTE_AVG);
+                    getLoaderManager().restartLoader(MOVIE_GALLERY_LOADER, null, this);
                     sortList(item);
+                }
+                return true;
+
+            case R.id.sort_by_favourite:
+                if (!item.isChecked()) {
+                    PreferenceManager.getInstance().setInt(Constants.BundleKeys.SORT_PREFERENCE,
+                            Constants.SortPreference.SORT_BY_FAVOURITE);
+                    getLoaderManager().restartLoader(MOVIE_GALLERY_LOADER, null, this);
                 }
                 return true;
 
@@ -279,12 +289,19 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String sortOrder;
-        if (PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
-                Constants.SortPreference.SORT_BY_POPULARITY) == Constants.SortPreference.SORT_BY_POPULARITY) {
-            sortOrder = MovieContract.MovieEntry.COLUMN_POSTER_PATH + " DESC";
-        } else {
-            sortOrder = MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE + " DESC";
+        String sortOrder = null;
+        switch (PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
+                Constants.SortPreference.SORT_BY_POPULARITY)) {
+            /*case Constants.SortPreference.SORT_BY_POPULARITY:
+                sortOrder = MovieContract.MovieEntry.COLUMN_POSTER_PATH + " DESC";
+                break;
+            case Constants.SortPreference.SORT_BY_VOTE_AVG:
+                sortOrder = MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE + " DESC";
+                break;*/
+            case Constants.SortPreference.SORT_BY_FAVOURITE:
+                sortOrder = MovieContract.MovieEntry.COLUMN_FAVOURITE + " DESC";
+                break;
+
         }
 
         return new CursorLoader(getActivity(),

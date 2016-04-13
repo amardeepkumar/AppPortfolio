@@ -7,7 +7,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 
 import com.udacity.myappportfolio.R;
-import com.udacity.myappportfolio.adapter.MovieGalleryAdapter;
 import com.udacity.myappportfolio.adapter.MovieGalleryCursorAdapter;
 import com.udacity.myappportfolio.databinding.ActivityMovieBinding;
 import com.udacity.myappportfolio.fragment.MovieDetailFragment;
@@ -77,11 +76,21 @@ public class MovieActivity extends BaseActivity implements MovieGalleryCursorAda
             //Hiding menu for detail fragment in case of phone
             menu.findItem(R.id.sort_by_popular).setVisible(false);
             menu.findItem(R.id.sort_by_highest_rated).setVisible(false);
-        } else if (PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
-                Constants.SortPreference.SORT_BY_POPULARITY) == Constants.SortPreference.SORT_BY_POPULARITY) {
-            menu.findItem(R.id.sort_by_popular).setChecked(true);
+            menu.findItem(R.id.sort_by_favourite).setVisible(false);
         } else {
-            menu.findItem(R.id.sort_by_highest_rated).setChecked(true);
+            switch (PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
+                    Constants.SortPreference.SORT_BY_POPULARITY)) {
+                case Constants.SortPreference.SORT_BY_POPULARITY:
+                    menu.findItem(R.id.sort_by_popular).setChecked(true);
+                    break;
+                case Constants.SortPreference.SORT_BY_VOTE_AVG:
+                    menu.findItem(R.id.sort_by_highest_rated).setChecked(true);
+                    break;
+                case Constants.SortPreference.SORT_BY_FAVOURITE:
+                    menu.findItem(R.id.sort_by_favourite).setChecked(true);
+                    break;
+
+            }
         }
 
         return super.onPrepareOptionsMenu(menu);

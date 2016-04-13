@@ -93,7 +93,7 @@ public class MovieGalleryCursorAdapter extends CursorRecyclerViewAdapter<MovieGa
             if (mCursor != null && mCursor.moveToPosition(getAdapterPosition())) {
                 CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(view.getContext().getContentResolver());
                 ContentValues values = new ContentValues();
-                values.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, mCursor.getInt(MovieGalleryFragment.COLUMN_FAVOURITE) == 0 ? 1 : 0);
+                values.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, mCursor.getInt(MovieGalleryFragment.COLUMN_FAVOURITE) == 0 ? Integer.valueOf(1) : Integer.valueOf(0));
 
                 queryHandler.startUpdate(1, null, MovieContract.MovieEntry.CONTENT_URI,
                         values, MovieContract.MovieEntry._ID + " = ?",

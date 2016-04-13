@@ -15,5 +15,6 @@ public class Constants {
     public interface SortPreference {
         int SORT_BY_POPULARITY = 1001;
         int SORT_BY_VOTE_AVG = 1002;
+        int SORT_BY_FAVOURITE = 1003;
     }
 }
