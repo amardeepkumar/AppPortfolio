@@ -69,7 +69,7 @@ public class MovieActivity extends BaseActivity implements MovieGalleryCursorAda
             //Hiding menu for detail fragment in case of phone
             menu.findItem(R.id.sort_by_popular).setVisible(false);
             menu.findItem(R.id.sort_by_highest_rated).setVisible(false);
-            menu.findItem(R.id.sort_by_favourite).setVisible(false);
+            menu.findItem(R.id.list_favourite).setVisible(false);
         } else {
             switch (PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
                     Constants.SortPreference.SORT_BY_POPULARITY)) {
@@ -80,7 +80,7 @@ public class MovieActivity extends BaseActivity implements MovieGalleryCursorAda
                     menu.findItem(R.id.sort_by_highest_rated).setChecked(true);
                     break;
                 case Constants.SortPreference.SORT_BY_FAVOURITE:
-                    menu.findItem(R.id.sort_by_favourite).setChecked(true);
+                    menu.findItem(R.id.list_favourite).setChecked(true);
                     break;
 
             }

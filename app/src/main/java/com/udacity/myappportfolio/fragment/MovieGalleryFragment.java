@@ -1,5 +1,7 @@
 package com.udacity.myappportfolio.fragment;
 
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -30,8 +32,8 @@ import com.udacity.myappportfolio.utility.DialogUtils;
 import com.udacity.myappportfolio.utility.NetworkUtil;
 import com.udacity.myappportfolio.utility.PreferenceManager;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -72,24 +74,36 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
     private int firstVisibleItem;
     private int mCurrentPage;
     private MovieGalleryCursorAdapter.OnItemClickListener mItemClickListener;
+    private RecyclerView.OnScrollListener mOnScrollListener;
 
     //Callback for reset adapter.
     private final Callback<DiscoverMovieResponse> mCallBack = new Callback<DiscoverMovieResponse>() {
         @Override
         public void onResponse(Call<DiscoverMovieResponse> call, final Response<DiscoverMovieResponse> response) {
-            final AtomicInteger responseCount = new AtomicInteger(0);
+//            final AtomicInteger responseCount = new AtomicInteger(0);
             CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(getActivity().getContentResolver());
-            queryHandler.setAsyncDeleteListener(new CustomAsyncQueryHandler.AsyncDeleteListener() {
+            queryHandler.setAsyncApplyBatchListener(new CustomAsyncQueryHandler.AsyncApplyBatchListener() {
                 @Override
-                public void onDeleteComplete(int token, Object cookie, int result) {
-                    if (responseCount.incrementAndGet() == 3) {
-                        saveDataAndUpdateUi(response);
-                    }
+                public void onApplyBatchComplete(int token, Object cookie, ContentProviderResult[] result) {
+                    saveDataAndUpdateUi(response);
                 }
             });
-            queryHandler.startDelete(2, null, MovieContract.MovieEntry.CONTENT_URI, null, null);
+
+            ArrayList<ContentProviderOperation> ops = new ArrayList<>();
+            ops.add(ContentProviderOperation.newDelete(MovieContract.MovieEntry.CONTENT_URI)
+                    .withSelection(null, null)
+                    .build());
+            ops.add(ContentProviderOperation.newDelete(MovieContract.VideoEntry.CONTENT_URI)
+                    .withSelection(null, null)
+                    .build());
+            ops.add(ContentProviderOperation.newDelete(MovieContract.ReviewEntry.CONTENT_URI)
+                    .withSelection(null, null)
+                    .build());
+            queryHandler.applyBatch(1, null, MovieContract.CONTENT_AUTHORITY, ops);
+
+            /*queryHandler.startDelete(2, null, MovieContract.MovieEntry.CONTENT_URI, null, null);
             queryHandler.startDelete(3, null, MovieContract.VideoEntry.CONTENT_URI, null, null);
-            queryHandler.startDelete(4, null, MovieContract.ReviewEntry.CONTENT_URI, null, null);
+            queryHandler.startDelete(4, null, MovieContract.ReviewEntry.CONTENT_URI, null, null);*/
         }
 
         @Override
@@ -131,7 +145,8 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
         final GridLayoutManager gridLayoutManager = new GridLayoutManager(mContext, 2);
         binding.movieList.setLayoutManager(gridLayoutManager);
         binding.movieList.setAdapter(new MovieGalleryCursorAdapter(mContext, null, mItemClickListener));
-        binding.movieList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+        mOnScrollListener = new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 /*check for scroll down*/
@@ -147,8 +162,12 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
                     }
                 }
             }
-        });
-        loadMore(this);
+        };
+        if (PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
+                Constants.SortPreference.SORT_BY_FAVOURITE) != Constants.SortPreference.SORT_BY_FAVOURITE) {
+            binding.movieList.addOnScrollListener(mOnScrollListener);
+            loadMore(this);
+        }
         return binding.getRoot();
     }
 
@@ -157,6 +176,7 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
         switch (item.getItemId()) {
             case R.id.sort_by_popular:
                 if (!item.isChecked()) {
+                    binding.movieList.addOnScrollListener(mOnScrollListener);
                     PreferenceManager.getInstance().setInt(Constants.BundleKeys.SORT_PREFERENCE,
                             Constants.SortPreference.SORT_BY_POPULARITY);
                     getLoaderManager().restartLoader(MOVIE_GALLERY_LOADER, null, this);
@@ -166,6 +186,7 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
 
             case R.id.sort_by_highest_rated:
                 if (!item.isChecked()) {
+                    binding.movieList.addOnScrollListener(mOnScrollListener);
                     PreferenceManager.getInstance().setInt(Constants.BundleKeys.SORT_PREFERENCE,
                             Constants.SortPreference.SORT_BY_VOTE_AVG);
                     getLoaderManager().restartLoader(MOVIE_GALLERY_LOADER, null, this);
@@ -173,8 +194,9 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
                 }
                 return true;
 
-            case R.id.sort_by_favourite:
+            case R.id.list_favourite:
                 if (!item.isChecked()) {
+                    binding.movieList.clearOnScrollListeners();
                     PreferenceManager.getInstance().setInt(Constants.BundleKeys.SORT_PREFERENCE,
                             Constants.SortPreference.SORT_BY_FAVOURITE);
                     getLoaderManager().restartLoader(MOVIE_GALLERY_LOADER, null, this);
@@ -279,11 +301,13 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String sortOrder = null;
+        String[] projection = null;
+        String selection = null;
         switch (PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
                 Constants.SortPreference.SORT_BY_POPULARITY)) {
             case Constants.SortPreference.SORT_BY_FAVOURITE:
-                sortOrder = MovieContract.MovieEntry.COLUMN_FAVOURITE + " DESC";
+                selection = MovieContract.MovieEntry.COLUMN_FAVOURITE + " = ?";
+                projection = new String[]{"1"};
                 break;
 
         }
@@ -291,9 +315,9 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
         return new CursorLoader(getActivity(),
                 MovieContract.MovieEntry.CONTENT_URI,
                 MOVIE_PROJECTION,
-                null,
-                null,
-                sortOrder);
+                selection,
+                projection,
+                null);
     }
 
     @Override

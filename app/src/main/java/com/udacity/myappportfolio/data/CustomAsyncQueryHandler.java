@@ -84,11 +84,11 @@ public class CustomAsyncQueryHandler extends AsyncQueryHandler {
 
     @Override
     protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-        final AsyncQueryListener listener = mListener.get();
-        if (listener != null) {
-            listener.onQueryComplete(token, cookie, cursor);
-        } else if (cursor != null) {
-            cursor.close();
+        if (mListener!= null &&  mListener.get() != null) {
+            mListener.get().onQueryComplete(token, cookie, cursor);
+            if (cursor != null) {
+                cursor.close();
+            }
         }
     }
 
@@ -99,33 +99,29 @@ public class CustomAsyncQueryHandler extends AsyncQueryHandler {
 
     @Override
     protected void onBulkInsertComplete(int token, Object cookie, int result) {
-        final AsyncBulkInsertListener listener = mBulkInsertListener.get();
-        if (listener != null) {
-            listener.onBulkInsertComplete(token, cookie, result);
+        if (mBulkInsertListener!= null &&  mBulkInsertListener.get() != null) {
+            mBulkInsertListener.get().onBulkInsertComplete(token, cookie, result);
         }
     }
 
     @Override
     protected void onDeleteComplete(int token, Object cookie, int result) {
-        final AsyncDeleteListener listener = mDeleteListener.get();
-        if (listener != null) {
-            listener.onDeleteComplete(token, cookie, result);
+        if (mDeleteListener!= null &&  mDeleteListener.get() != null) {
+            mDeleteListener.get().onDeleteComplete(token, cookie, result);
         }
     }
 
     @Override
     protected void onUpdateComplete(int token, Object cookie, int result) {
-        final AsyncUpdateListener listener = mUpdateListener.get();
-        if (listener != null) {
-            listener.onUpdateComplete(token, cookie, result);
+        if (mUpdateListener!= null &&  mUpdateListener.get() != null) {
+            mUpdateListener.get().onUpdateComplete(token, cookie, result);
         }
     }
 
     @Override
     protected void onApplyBatchComplete(int token, Object cookie, ContentProviderResult[] result) {
-        final AsyncApplyBatchListener listener = mApplyBatchListener.get();
-        if (listener != null) {
-            listener.onApplyBatchComplete(token, cookie, result);
+        if (mApplyBatchListener!= null &&  mApplyBatchListener.get() != null) {
+            mApplyBatchListener.get().onApplyBatchComplete(token, cookie, result);
         }
     }
 }
