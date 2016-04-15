@@ -3,6 +3,8 @@ package com.udacity.myappportfolio.network;
 
 import com.udacity.myappportfolio.model.response.DiscoverMovieResponse;
 import com.udacity.myappportfolio.model.response.MovieDetailResponse;
+import com.udacity.myappportfolio.model.response.MovieReviewResponse;
+import com.udacity.myappportfolio.model.response.MovieVideoResponse;
 import com.udacity.myappportfolio.utility.KeyConstants;
 
 import java.util.HashMap;
@@ -52,6 +54,18 @@ public class NetworkManager {
     public static void requestMovieDetails(String movieId, Callback<MovieDetailResponse> callback) {
         ApiService service = getApiService();
         Call<MovieDetailResponse> model = service.requestMovieDetail(movieId, KeyConstants.API_KEY);
+        model.enqueue(callback);
+    }
+
+    public static void requestMovieTrailers(String movieId, Callback<MovieVideoResponse> callback) {
+        ApiService service = getApiService();
+        Call<MovieVideoResponse> model = service.requestMovieTrailers(movieId, KeyConstants.API_KEY);
+        model.enqueue(callback);
+    }
+
+    public static void requestMovieReviews(String movieId, Callback<MovieReviewResponse> callback) {
+        ApiService service = getApiService();
+        Call<MovieReviewResponse> model = service.requestMovieReviews(movieId, KeyConstants.API_KEY);
         model.enqueue(callback);
     }
 }

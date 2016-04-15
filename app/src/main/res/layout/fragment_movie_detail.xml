@@ -13,6 +13,10 @@
             name="data"
             type="com.udacity.myappportfolio.model.response.MovieDetailResponse" />
 
+        <variable
+            name="clickHandler"
+            type="android.view.View.OnClickListener" />
+
     </data>
 
     <FrameLayout
@@ -38,6 +42,17 @@
                     android:contentDescription="@string/movie_detail_image"
                     android:scaleType="fitXY"
                     app:imageUrl="@{data.posterPath ?? data.backdropPath}" />
+
+                <ImageView
+                    android:id="@+id/favourite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:onClick="@{clickHandler.onClick}"
+                    android:padding="@dimen/dp_10" />
+                <!--android:src="@{data.favourite ? @drawable/your_wish_list_1 : @drawable/your_wish_list}"-->
+
 
                 <TextView
                     android:id="@+id/title"

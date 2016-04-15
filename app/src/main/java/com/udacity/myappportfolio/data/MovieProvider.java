@@ -26,24 +26,25 @@ public class MovieProvider extends ContentProvider {
         sWeatherByLocationSettingQueryBuilder = new SQLiteQueryBuilder();
         
         //This is an inner join which looks like
-        //weather INNER JOIN location ON weather.location_id = location._id
+        //movie INNER JOIN video ON movie.movie_id = video INNER JOIN review ON movie.movie_id = review.movie_id
         sWeatherByLocationSettingQueryBuilder.setTables(
-                MovieContract.MovieEntry.TABLE_NAME + " INNER JOIN " +
+                MovieContract.MovieEntry.TABLE_NAME + " LEFT OUTER JOIN " +
                         MovieContract.VideoEntry.TABLE_NAME +
                         " ON " + MovieContract.MovieEntry.TABLE_NAME +
                         "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID +
-                        " = " + MovieContract.VideoEntry.TABLE_NAME + " INNER JOIN " +
+                        " = " + MovieContract.VideoEntry.TABLE_NAME +
+                        "." + MovieContract.VideoEntry.COLUMN_MOVIE_ID + " LEFT OUTER JOIN " +
                         MovieContract.ReviewEntry.TABLE_NAME +
                         " ON " + MovieContract.MovieEntry.TABLE_NAME +
                         "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID +
                         " = " + MovieContract.ReviewEntry.TABLE_NAME +
                         "." + MovieContract.ReviewEntry.COLUMN_MOVIE_ID);
     }
-
+/*
     //location.location_setting = ?
     private static final String sMovieSelection =
             MovieContract.MovieEntry.TABLE_NAME +
-                    "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ";
+                    "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ";*/
 
     /*private Cursor getMovieWithVideoAndReview(
             Uri uri, String[] projection, String sortOrder) {
@@ -112,7 +113,7 @@ public class MovieProvider extends ContentProvider {
             {
                 retCursor = sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                         projection,
-                        sMovieSelection,
+                        selection,
                         selectionArgs,
                         null,
                         null,

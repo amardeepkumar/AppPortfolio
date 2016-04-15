@@ -26,7 +26,7 @@ public interface ApiService {
                                                  @Query(Config.UrlConstants.API_KEY) String apiKey);
 
     @GET("/3/movie/{id}/videos")
-    Call<MovieVideoResponse> requestMovieVideos(@Path(Config.UrlConstants.ID) String movieId,
+    Call<MovieVideoResponse> requestMovieTrailers(@Path(Config.UrlConstants.ID) String movieId,
                                                 @Query(Config.UrlConstants.API_KEY) String apiKey);
 
     @GET("/3/movie/{id}/reviews")

@@ -55,6 +55,12 @@ public class MovieContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
+
+        public static Uri buildMovieTrailerWithReview() {
+            return CONTENT_URI.buildUpon().appendPath("trailer")
+                    .appendPath("review").build();
+        }
+
         /*public static Uri buildWeatherLocation(String locationSetting) {
             return CONTENT_URI.buildUpon().appendPath(locationSetting).build();
         }
@@ -123,7 +129,7 @@ public class MovieContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEW;
 
-        public static final String TABLE_NAME = "video";
+        public static final String TABLE_NAME = "review";
 
         public static final String COLUMN_REVIEW_ID = "review_id";
         public static final String COLUMN_AUTHOR = "author";

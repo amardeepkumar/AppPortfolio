@@ -164,7 +164,7 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
             }
         };
         if (PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
-                Constants.SortPreference.SORT_BY_FAVOURITE) != Constants.SortPreference.SORT_BY_FAVOURITE) {
+                Constants.SortPreference.SORT_BY_POPULARITY) != Constants.SortPreference.SORT_BY_FAVOURITE) {
             binding.movieList.addOnScrollListener(mOnScrollListener);
             loadMore(this);
         }
