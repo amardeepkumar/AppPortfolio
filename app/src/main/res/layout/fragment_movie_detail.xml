@@ -11,7 +11,7 @@
 
         <variable
             name="data"
-            type="com.udacity.myappportfolio.model.response.MovieDetailResponse" />
+            type="com.udacity.myappportfolio.model.response.MovieResult" />
 
         <variable
             name="clickHandler"
@@ -50,8 +50,8 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
                     android:onClick="@{clickHandler.onClick}"
-                    android:padding="@dimen/dp_10" />
-                <!--android:src="@{data.favourite ? @drawable/your_wish_list_1 : @drawable/your_wish_list}"-->
+                    android:padding="@dimen/dp_10"
+                    android:src="@{data.favourite ? @drawable/your_wish_list_1 : @drawable/your_wish_list}"/>
 
 
                 <TextView

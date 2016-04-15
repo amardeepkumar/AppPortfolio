@@ -301,13 +301,13 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] projection = null;
+        String[] selectionArgs = null;
         String selection = null;
         switch (PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
                 Constants.SortPreference.SORT_BY_POPULARITY)) {
             case Constants.SortPreference.SORT_BY_FAVOURITE:
                 selection = MovieContract.MovieEntry.COLUMN_FAVOURITE + " = ?";
-                projection = new String[]{"1"};
+                selectionArgs = new String[]{"1"};
                 break;
 
         }
@@ -316,7 +316,7 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
                 MovieContract.MovieEntry.CONTENT_URI,
                 MOVIE_PROJECTION,
                 selection,
-                projection,
+                selectionArgs,
                 null);
     }
 

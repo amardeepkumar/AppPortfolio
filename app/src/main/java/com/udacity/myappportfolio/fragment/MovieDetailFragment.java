@@ -22,6 +22,7 @@ import com.udacity.myappportfolio.data.CustomAsyncQueryHandler;
 import com.udacity.myappportfolio.data.MovieContract;
 import com.udacity.myappportfolio.databinding.FragmentMovieDetailBinding;
 import com.udacity.myappportfolio.model.response.MovieDetailResponse;
+import com.udacity.myappportfolio.model.response.MovieResult;
 import com.udacity.myappportfolio.model.response.MovieReviewResponse;
 import com.udacity.myappportfolio.model.response.MovieVideoResponse;
 import com.udacity.myappportfolio.model.response.ReviewResult;
@@ -50,6 +51,10 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
             MovieContract.MovieEntry.COLUMN_BACK_DROP_PATH,
             MovieContract.MovieEntry.COLUMN_POSTER_PATH,
             MovieContract.MovieEntry.COLUMN_FAVOURITE,
+            MovieContract.MovieEntry.COLUMN_OVERVIEW,
+            MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE,
+            MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE,
+            MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
             MovieContract.VideoEntry.COLUMN_VIDEO_ID,
             MovieContract.VideoEntry.COLUMN_VIDEO_NAME,
             MovieContract.VideoEntry.COLUMN_VIDEO_KEY,
@@ -64,12 +69,16 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
     public static final int COLUMN_BACK_DROP_PATH = 2;
     public static final int COLUMN_POSTER_PATH = 3;
     public static final int COLUMN_FAVOURITE = 4;
-    public static final int COLUMN_VIDEO_ID = 5;
-    public static final int COLUMN_VIDEO_NAME = 6;
-    public static final int COLUMN_VIDEO_KEY = 7;
-    public static final int COLUMN_REVIEW_ID = 8;
-    public static final int COLUMN_CONTENT = 9;
-    public static final int COLUMN_AUTHOR = 10;
+    public static final int COLUMN_OVERVIEW = 5;
+    public static final int COLUMN_VOTE_AVERAGE = 6;
+    public static final int COLUMN_ORIGINAL_TITLE = 7;
+    public static final int COLUMN_RELEASE_DATE = 8;
+    public static final int COLUMN_VIDEO_ID = 9;
+    public static final int COLUMN_VIDEO_NAME = 10;
+    public static final int COLUMN_VIDEO_KEY = 11;
+    public static final int COLUMN_REVIEW_ID = 12;
+    public static final int COLUMN_CONTENT = 13;
+    public static final int COLUMN_AUTHOR = 14;
     private static final int MOVIE_DETAIL_LOADER = 1;
 
     private String mMovieId;
@@ -126,7 +135,7 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
             if (binding != null) {
                 binding.progressBar.setVisibility(View.VISIBLE);
             }
-            NetworkManager.requestMovieDetails(mMovieId, this);
+//            NetworkManager.requestMovieDetails(mMovieId, this);
             NetworkManager.requestMovieTrailers(mMovieId, new Callback<MovieVideoResponse>() {
                 @Override
                 public void onResponse(Call<MovieVideoResponse> call, Response<MovieVideoResponse> response) {
@@ -160,6 +169,7 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
 
     public void loadMovieDetails(String movieId) {
         mMovieId = movieId;
+        getLoaderManager().restartLoader(MOVIE_DETAIL_LOADER, null, this);
         loadMovieDetails();
     }
 
@@ -167,10 +177,7 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
     public void onResponse(Call<MovieDetailResponse> call, Response<MovieDetailResponse> response) {
         if (response != null && response.isSuccess()
                 && response.body() != null) {
-            binding.setData(response.body());
-            if (binding != null) {
-                binding.progressBar.setVisibility(View.GONE);
-            }
+
         }
     }
 
@@ -212,11 +219,17 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Uri uri = MovieContract.MovieEntry.buildMovieTrailerWithReview();
+        String[] selectionArgs = null;
+        String selection = null;
+        if (mMovieId != null) {
+            selection = MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
+            selectionArgs = new String[]{mMovieId};
+        }
         return new CursorLoader(getActivity(),
                 uri,
                 MOVIE_DETAIL_PROJECTION,
-                null,
-                null,
+                selection,
+                selectionArgs,
                 null);
     }
 
@@ -225,8 +238,25 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
         String movieId = null;
         if (data != null && data.moveToFirst()) {
             movieId = data.getString(COLUMN_MOVIE_ID);
+            if (binding != null) {
+                binding.setData(getMovieResultFromCursor(data));
+                binding.progressBar.setVisibility(View.GONE);
+            }
         }
         Toast.makeText(getActivity(), "movie Id = " + movieId, Toast.LENGTH_SHORT).show();
+    }
+
+    private MovieResult getMovieResultFromCursor(Cursor cursor) {
+        MovieResult movie = new MovieResult();
+        movie.setId(cursor.getString(COLUMN_MOVIE_ID));
+        movie.setBackdropPath(cursor.getString(COLUMN_BACK_DROP_PATH));
+        movie.setPosterPath(cursor.getString(COLUMN_POSTER_PATH));
+        movie.setFavourite(cursor.getInt(COLUMN_FAVOURITE) > 0);
+        movie.setOverview(cursor.getString(COLUMN_OVERVIEW));
+        movie.setVoteAverage(cursor.getFloat(COLUMN_VOTE_AVERAGE));
+        movie.setOriginalTitle(cursor.getString(COLUMN_ORIGINAL_TITLE));
+        movie.setReleaseDate(cursor.getString(COLUMN_RELEASE_DATE));
+        return movie;
     }
 
     @Override
