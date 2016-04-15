@@ -17,6 +17,7 @@ import com.udacity.myappportfolio.data.MovieContract;
 import com.udacity.myappportfolio.databinding.ItemMovieGalleryBinding;
 import com.udacity.myappportfolio.fragment.MovieGalleryFragment;
 import com.udacity.myappportfolio.model.response.MovieResult;
+import com.udacity.myappportfolio.utility.DatabaseUtils;
 
 import java.util.ArrayList;
 
@@ -123,13 +124,8 @@ public class MovieGalleryCursorAdapter extends CursorRecyclerViewAdapter<MovieGa
 
         public void OnFavouriteClicked(View view) {
             if (mCursor != null && mCursor.moveToPosition(getAdapterPosition())) {
-                CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(view.getContext().getContentResolver());
-                ContentValues values = new ContentValues();
-                values.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, mCursor.getInt(MovieGalleryFragment.COLUMN_FAVOURITE) == 0 ? Integer.valueOf(1) : Integer.valueOf(0));
-
-                queryHandler.startUpdate(1, null, MovieContract.MovieEntry.CONTENT_URI,
-                        values, MovieContract.MovieEntry._ID + " = ?",
-                        new String[]{mCursor.getString(MovieGalleryFragment.COLUMN_ID)});
+                DatabaseUtils.setFavourite(view.getContext(), mCursor.getString(MovieGalleryFragment.COLUMN_MOVIE_ID),
+                        mCursor.getInt(MovieGalleryFragment.COLUMN_FAVOURITE) == 0 ? 1 : 0);
             }
         }
     }

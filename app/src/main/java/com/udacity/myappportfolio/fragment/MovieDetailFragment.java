@@ -29,6 +29,7 @@ import com.udacity.myappportfolio.model.response.ReviewResult;
 import com.udacity.myappportfolio.model.response.VideoResult;
 import com.udacity.myappportfolio.network.NetworkManager;
 import com.udacity.myappportfolio.utility.Constants;
+import com.udacity.myappportfolio.utility.DatabaseUtils;
 import com.udacity.myappportfolio.utility.DialogUtils;
 import com.udacity.myappportfolio.utility.NetworkUtil;
 
@@ -83,6 +84,7 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
 
     private String mMovieId;
     private FragmentMovieDetailBinding binding;
+    private Cursor mCursor;
 
     public static MovieDetailFragment getInstance(String movieId) {
         MovieDetailFragment fragment = new MovieDetailFragment();
@@ -212,6 +214,11 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
                 queryHandler.startUpdate(1, null, MovieContract.MovieEntry.CONTENT_URI,
                         values, MovieContract.MovieEntry._ID + " = ?",
                         new String[]{mCursor.getString(MovieGalleryFragment.COLUMN_ID)});*/
+
+                if (mCursor != null && mMovieId != null) {
+                    DatabaseUtils.setFavourite(v.getContext(), mMovieId,
+                            mCursor.getInt(MovieGalleryFragment.COLUMN_FAVOURITE) == 0 ? 1 : 0);
+                }
                 break;
         }
     }
@@ -237,6 +244,7 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         String movieId = null;
         if (data != null && data.moveToFirst()) {
+            mCursor = data;
             movieId = data.getString(COLUMN_MOVIE_ID);
             if (binding != null) {
                 binding.setData(getMovieResultFromCursor(data));
