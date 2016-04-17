@@ -20,6 +20,9 @@ import android.os.RemoteException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+/**
+ * Customized class to add the feature of bulk insert and batch operations in existing {@link android.content.AsyncQueryHandler}
+ */
 public abstract class AsyncQueryHandler extends Handler {
     private static final int EVENT_ARG_QUERY = 1;
     private static final int EVENT_ARG_INSERT = 2;

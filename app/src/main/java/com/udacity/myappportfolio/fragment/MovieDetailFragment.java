@@ -24,7 +24,6 @@ import com.udacity.myappportfolio.data.MovieContract;
 import com.udacity.myappportfolio.databinding.FragmentMovieDetailBinding;
 import com.udacity.myappportfolio.databinding.ReviewLayoutBinding;
 import com.udacity.myappportfolio.databinding.TrailerLayoutBinding;
-import com.udacity.myappportfolio.model.response.MovieDetailResponse;
 import com.udacity.myappportfolio.model.response.MovieResult;
 import com.udacity.myappportfolio.model.response.MovieReviewResponse;
 import com.udacity.myappportfolio.model.response.MovieVideoResponse;
@@ -47,8 +46,7 @@ import retrofit2.Response;
 /**
  * Created by Amardeep on 18/2/16.
  */
-public class MovieDetailFragment extends BaseFragment implements Callback<MovieDetailResponse>,
-        View.OnClickListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class MovieDetailFragment extends BaseFragment implements View.OnClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = MovieDetailFragment.class.getSimpleName();
     private static final String[] MOVIE_DETAIL_PROJECTION = new String[]{
@@ -85,13 +83,14 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
     public static final int COLUMN_REVIEW_ID = 12;
     public static final int COLUMN_REVIEW_CONTENT = 13;
     public static final int COLUMN_REVIEW_AUTHOR = 14;
+
     private static final int MOVIE_DETAIL_LOADER = 1;
 
     private String mMovieId;
     private FragmentMovieDetailBinding binding;
     private Cursor mCursor;
     private LayoutInflater mInflater;
-    private AtomicInteger mResponseCount;
+    private AtomicInteger mResponseCount;//Counter to reload cursor after all API response
 
     public static MovieDetailFragment getInstance(String movieId) {
         MovieDetailFragment fragment = new MovieDetailFragment();
@@ -146,11 +145,10 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
             if (binding != null) {
                 binding.progressBar.setVisibility(View.VISIBLE);
             }
-//            NetworkManager.requestMovieDetails(mMovieId, this);
             NetworkManager.requestMovieTrailers(mMovieId, new Callback<MovieVideoResponse>() {
                 @Override
                 public void onResponse(Call<MovieVideoResponse> call, Response<MovieVideoResponse> response) {
-                    saveTrailers(response);
+                    saveTrailersInDb(response);
                 }
 
                 @Override
@@ -162,7 +160,7 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
             NetworkManager.requestMovieReviews(mMovieId, new Callback<MovieReviewResponse>() {
                 @Override
                 public void onResponse(Call<MovieReviewResponse> call, Response<MovieReviewResponse> response) {
-                    saveReviews(response);
+                    saveReviewsInDb(response);
                 }
 
                 @Override
@@ -185,23 +183,6 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
     }
 
     @Override
-    public void onResponse(Call<MovieDetailResponse> call, Response<MovieDetailResponse> response) {
-        if (response != null && response.isSuccess()
-                && response.body() != null) {
-
-        }
-    }
-
-    @Override
-    public void onFailure(Call<MovieDetailResponse> call, Throwable t) {
-        DialogUtils.showToast(R.string.response_failed, mContext);
-
-        if (binding != null) {
-            binding.progressBar.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case android.R.id.home:
@@ -213,7 +194,6 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
 
     @Override
     public void onClick(View v) {
-
         switch (v.getId()) {
             case R.id.favourite:
                 if (mCursor != null && mMovieId != null  && mCursor.moveToFirst()) {
@@ -255,14 +235,14 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
             mCursor = data;
             if (binding != null) {
                 binding.setData(getMovieResultFromCursor(data));
-                getTrailers(data);
-                getReviews(data);
+                inflateTrailerUi(data);
+                inflateReviewUi(data);
                 binding.progressBar.setVisibility(View.GONE);
             }
         }
     }
 
-    private void getTrailers(Cursor cursor) {
+    private void inflateTrailerUi(Cursor cursor) {
         List<String> videoKeys = new ArrayList<>();
         binding.movieDetailTrailerLayout.removeAllViews();
         do {
@@ -280,10 +260,11 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
                 videoKeys.add(key);
             }
         } while (cursor.moveToNext());
+        binding.setTrailerCount(videoKeys.size());
         binding.movieDetailTrailerLayout.invalidate();
     }
 
-    private void getReviews(Cursor cursor) {
+    private void inflateReviewUi(Cursor cursor) {
         cursor.moveToFirst();
         List<String> reviewIds = new ArrayList<>();
         binding.movieDetailReviewLayout.removeAllViews();
@@ -302,6 +283,7 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
                 reviewIds.add(id);
             }
         } while (cursor.moveToNext());
+        binding.setReviewCount(reviewIds.size());
         binding.movieDetailReviewLayout.invalidate();
     }
 
@@ -321,7 +303,7 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
     @Override
     public void onLoaderReset(Loader<Cursor> loader) { }
 
-    private void saveTrailers(Response<MovieVideoResponse> response) {
+    private void saveTrailersInDb(Response<MovieVideoResponse> response) {
         final List<VideoResult> results = response.body().getResults();
         if (results.size() > 0) {
             CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(mContext.getContentResolver());
@@ -344,11 +326,11 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
                 contentValues[i++] = contentValue;
             }
             queryHandler.startBulkInsert(1, null, MovieContract.VideoEntry.CONTENT_URI, contentValues);
-//            getLoaderManager().restartLoader(MOVIE_DETAIL_LOADER, null, this);
         }
     }
 
     private void refreshUi() {
+        //Check the response count
         if (mResponseCount.incrementAndGet() == 2) {
             mResponseCount.set(0);
             //All response came
@@ -356,7 +338,7 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
         }
     }
 
-    private void saveReviews(Response<MovieReviewResponse> response) {
+    private void saveReviewsInDb(Response<MovieReviewResponse> response) {
         final List<ReviewResult> results = response.body().getResults();
         if (results.size() > 0) {
             CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(mContext.getContentResolver());

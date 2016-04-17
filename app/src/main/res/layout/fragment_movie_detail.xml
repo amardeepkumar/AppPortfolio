@@ -17,6 +17,14 @@
             name="clickHandler"
             type="android.view.View.OnClickListener" />
 
+        <variable
+            name="trailerCount"
+            type="int" />
+
+        <variable
+            name="reviewCount"
+            type="int" />
+
     </data>
 
     <FrameLayout
@@ -97,7 +105,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/plot_synopsis"
                     android:text="@string/trailers"
-                    android:visibility="@{!TextUtils.isEmpty(data.originalTitle) ? View.VISIBLE: View.GONE}" />
+                    android:visibility="@{trailerCount > 0 ? View.VISIBLE: View.GONE}" />
 
                 <LinearLayout
                     android:id="@+id/movie_detail_trailer_layout"
@@ -112,7 +120,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/movie_detail_trailer_layout"
-                    android:text="@string/reviews" />
+                    android:text="@string/reviews"
+                    android:visibility="@{reviewCount > 0 ? View.VISIBLE: View.GONE}" />
 
                 <LinearLayout
                     android:id="@+id/movie_detail_review_layout"

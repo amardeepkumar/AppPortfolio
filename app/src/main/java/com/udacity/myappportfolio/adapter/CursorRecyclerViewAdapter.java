@@ -10,7 +10,7 @@ import android.database.DataSetObserver;
 import android.support.v7.widget.RecyclerView;
 
 /**
- * Created by skyfishjy on 10/31/14.
+ * A base classto provide cursor adapter to Recycler view
  */
 
 public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
@@ -128,7 +128,6 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
             super.onInvalidated();
             mDataValid = false;
             notifyDataSetChanged();
-            //There is no notifyDataSetInvalidated() method in RecyclerView.Adapter
         }
     }
 }

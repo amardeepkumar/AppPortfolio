@@ -28,7 +28,12 @@ public class MovieGalleryCursorAdapter extends CursorRecyclerViewAdapter<MovieGa
 
     private static final String TAG = MovieGalleryCursorAdapter.class.getSimpleName();
     private final OnItemClickListener mOnItemClickListener;
-    private int previousSelection;
+    private int previousSelection; //Cache old selected position
+    private final LayoutInflater mLayoutInflater;
+
+    public interface OnItemClickListener {
+        void OnItemClicked(String movieId);
+    }
 
     public MovieGalleryCursorAdapter(Context context, Cursor cursor, OnItemClickListener itemClickListener) {
         super(context, cursor);
@@ -36,13 +41,6 @@ public class MovieGalleryCursorAdapter extends CursorRecyclerViewAdapter<MovieGa
         mLayoutInflater = LayoutInflater.from(context);
         previousSelection = -2;//Setting to a non reachable cursor position
     }
-
-
-    public interface OnItemClickListener {
-        void OnItemClicked(String movieId);
-    }
-
-    private final LayoutInflater mLayoutInflater;
 
     @Override
     public MovieGalleryCursorAdapter.MovieGalleryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -88,12 +86,13 @@ public class MovieGalleryCursorAdapter extends CursorRecyclerViewAdapter<MovieGa
 
                 //Check for previous selection.
                 if (previousSelection != adapterPosition) {
+                    //Update the row in database for election
                     CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(view.getContext().getContentResolver());
 
-                    //Setting the selection to clicked item
                     ContentValues values = new ContentValues();
                     values.put(MovieContract.MovieEntry.COLUMN_IS_SELECTED, 1);
 
+                    //Setting the batch listener
                     queryHandler.setAsyncApplyBatchListener(new CustomAsyncQueryHandler.AsyncApplyBatchListener() {
                         @Override
                         public void onApplyBatchComplete(int token, Object cookie, ContentProviderResult[] result) {
@@ -101,6 +100,7 @@ public class MovieGalleryCursorAdapter extends CursorRecyclerViewAdapter<MovieGa
                         }
                     });
 
+                    //Create the operations
                     ArrayList<ContentProviderOperation> ops = new ArrayList<>();
                     ops.add(ContentProviderOperation.newUpdate(MovieContract.MovieEntry.CONTENT_URI)
                                     .withSelection(MovieContract.MovieEntry._ID + " = ?",
@@ -115,9 +115,9 @@ public class MovieGalleryCursorAdapter extends CursorRecyclerViewAdapter<MovieGa
                                 .build());
                     }
 
-
                     queryHandler.applyBatch(1, null, MovieContract.CONTENT_AUTHORITY, ops);
                 }
+                //Setting the selection to clicked item
                 previousSelection = adapterPosition;
             }
         }

@@ -40,27 +40,7 @@ public class MovieProvider extends ContentProvider {
                         " = " + MovieContract.ReviewEntry.TABLE_NAME +
                         "." + MovieContract.ReviewEntry.COLUMN_MOVIE_ID);
     }
-/*
-    //location.location_setting = ?
-    private static final String sMovieSelection =
-            MovieContract.MovieEntry.TABLE_NAME +
-                    "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ";*/
 
-    /*private Cursor getMovieWithVideoAndReview(
-            Uri uri, String[] projection, String sortOrder) {
-        String locationSetting = MovieContract.MovieEntry.getLocationSettingFromUri(uri);
-        long date = WeatherContract.WeatherEntry.getDateFromUri(uri);
-
-        return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
-                projection,
-                sMovieSelection,
-                new String[]{locationSetting, Long.toString(date)},
-                null,
-                null,
-                sortOrder
-        );
-    }
-*/
     private static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = MovieContract.CONTENT_AUTHORITY;
@@ -166,9 +146,6 @@ public class MovieProvider extends ContentProvider {
         return retCursor;
     }
 
-    /*
-        Student: Add the ability to insert Locations to the implementation of this function.
-     */
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();

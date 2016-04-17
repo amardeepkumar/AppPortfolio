@@ -47,15 +47,6 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
 
     private static final String TAG = MovieGalleryFragment.class.getSimpleName();
 
-    // These indices are tied to MOVIE_PROJECTION.  If MOVIE_PROJECTION changes, these
-    // must change.
-    public static final int COLUMN_ID = 0;
-    public static final int COLUMN_MOVIE_ID = 1;
-    public static final int COLUMN_BACK_DROP_PATH = 2;
-    public static final int COLUMN_POSTER_PATH = 3;
-    public static final int COLUMN_FAVOURITE = 4;
-    public static final int COLUMN_IS_SELECTED = 5;
-
     private static final String[] MOVIE_PROJECTION = {
             MovieContract.MovieEntry._ID,
             MovieContract.MovieEntry.COLUMN_MOVIE_ID,
@@ -64,6 +55,15 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
             MovieContract.MovieEntry.COLUMN_FAVOURITE,
             MovieContract.MovieEntry.COLUMN_IS_SELECTED
     };
+
+    // These indices are tied to MOVIE_PROJECTION.  If MOVIE_PROJECTION changes, these
+    // must change.
+    public static final int COLUMN_ID = 0;
+    public static final int COLUMN_MOVIE_ID = 1;
+    public static final int COLUMN_BACK_DROP_PATH = 2;
+    public static final int COLUMN_POSTER_PATH = 3;
+    public static final int COLUMN_FAVOURITE = 4;
+    public static final int COLUMN_IS_SELECTED = 5;
 
     private static final int MOVIE_GALLERY_LOADER = 0;
 
@@ -80,6 +80,7 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
     private final Callback<DiscoverMovieResponse> mCallBack = new Callback<DiscoverMovieResponse>() {
         @Override
         public void onResponse(Call<DiscoverMovieResponse> call, final Response<DiscoverMovieResponse> response) {
+            //Clearing all the records from all tables and saving new response
             CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(mContext.getContentResolver());
             queryHandler.setAsyncApplyBatchListener(new CustomAsyncQueryHandler.AsyncApplyBatchListener() {
                 @Override
@@ -141,6 +142,7 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
         binding.movieList.setLayoutManager(gridLayoutManager);
         binding.movieList.setAdapter(new MovieGalleryCursorAdapter(mContext, null, mItemClickListener));
 
+        //Infinite loading
         mOnScrollListener = new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -158,6 +160,8 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
                 }
             }
         };
+
+        //Remove pagination while user selects to see favourite movie list
         if (PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
                 Constants.SortPreference.SORT_BY_POPULARITY) != Constants.SortPreference.SORT_BY_FAVOURITE) {
             binding.movieList.addOnScrollListener(mOnScrollListener);
@@ -191,6 +195,7 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
 
             case R.id.list_favourite:
                 if (!item.isChecked()) {
+                    //Remove pagination while user selects to see favourite movie list
                     binding.movieList.clearOnScrollListeners();
                     PreferenceManager.getInstance().setInt(Constants.BundleKeys.SORT_PREFERENCE,
                             Constants.SortPreference.SORT_BY_FAVOURITE);
