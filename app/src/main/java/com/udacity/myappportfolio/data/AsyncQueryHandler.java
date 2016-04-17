@@ -33,7 +33,7 @@ public abstract class AsyncQueryHandler extends Handler {
 
     private final WeakReference<ContentResolver> mResolver;
     private static Looper sLooper = null;
-    private Handler mWorkerThreadHandler;
+    private final Handler mWorkerThreadHandler;
 
     protected static final class WorkerArgs {
         public Uri uri;
@@ -120,7 +120,7 @@ public abstract class AsyncQueryHandler extends Handler {
 
     public AsyncQueryHandler(ContentResolver cr) {
         super();
-        mResolver = new WeakReference<ContentResolver>(cr);
+        mResolver = new WeakReference<>(cr);
         synchronized (AsyncQueryHandler.class) {
             if (sLooper == null) {
                 HandlerThread thread = new HandlerThread("AsyncQueryWorker");

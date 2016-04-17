@@ -38,6 +38,4 @@
         <item name="android:textColor">@android:color/black</item>
         <item name="android:textSize">@dimen/sp_16</item>>
     </style>
-
-    <dimen name="sp_24">24sp</dimen>
 </resources>

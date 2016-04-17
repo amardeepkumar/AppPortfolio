@@ -36,7 +36,7 @@ public class MovieGalleryCursorAdapter extends CursorRecyclerViewAdapter<MovieGa
     }
 
     public MovieGalleryCursorAdapter(Context context, Cursor cursor, OnItemClickListener itemClickListener) {
-        super(context, cursor);
+        super(cursor);
         mOnItemClickListener = itemClickListener;
         mLayoutInflater = LayoutInflater.from(context);
         previousSelection = -2;//Setting to a non reachable cursor position

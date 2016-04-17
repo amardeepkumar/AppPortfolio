@@ -2,7 +2,6 @@ package com.udacity.myappportfolio.utility;
 
 import android.databinding.BindingAdapter;
 import android.support.v4.content.ContextCompat;
-import android.text.TextUtils;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;

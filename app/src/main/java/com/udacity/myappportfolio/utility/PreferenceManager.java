@@ -34,7 +34,7 @@ public class PreferenceManager {
 
 	/**
 	 * Returns singleton synchronized instance of PreferenceManager
-	 * @return Instance of PreferenceManeger
+	 * @return Instance of PreferenceManager
 	 */
 	public synchronized static PreferenceManager getInstance() {
 		return sInstance;
