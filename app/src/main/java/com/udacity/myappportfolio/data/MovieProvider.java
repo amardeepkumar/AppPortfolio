@@ -26,14 +26,14 @@ public class MovieProvider extends ContentProvider {
         sWeatherByLocationSettingQueryBuilder = new SQLiteQueryBuilder();
         
         //This is an inner join which looks like
-        //movie INNER JOIN video ON movie.movie_id = video INNER JOIN review ON movie.movie_id = review.movie_id
+        //movie LEFT JOIN video ON movie.movie_id = video.movie_id LEFT JOIN review ON movie.movie_id = review.movie_id
         sWeatherByLocationSettingQueryBuilder.setTables(
-                MovieContract.MovieEntry.TABLE_NAME + " LEFT OUTER JOIN " +
+                MovieContract.MovieEntry.TABLE_NAME + " LEFT JOIN " +
                         MovieContract.VideoEntry.TABLE_NAME +
                         " ON " + MovieContract.MovieEntry.TABLE_NAME +
                         "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID +
                         " = " + MovieContract.VideoEntry.TABLE_NAME +
-                        "." + MovieContract.VideoEntry.COLUMN_MOVIE_ID + " LEFT OUTER JOIN " +
+                        "." + MovieContract.VideoEntry.COLUMN_MOVIE_ID + " LEFT JOIN " +
                         MovieContract.ReviewEntry.TABLE_NAME +
                         " ON " + MovieContract.MovieEntry.TABLE_NAME +
                         "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID +

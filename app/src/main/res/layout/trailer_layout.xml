@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="trailer"
+            type="com.udacity.myappportfolio.model.response.VideoResult" />
+
+        <variable
+            name="clickHandler"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+
+    <TextView android:id="@+id/trailer"
+        style="@style/trailer_text_style"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:onClick="@{clickHandler.onClick}"
+        android:tag="@{trailer.key}"
+        android:text="@{trailer.name}" />
+</layout>

@@ -10,4 +10,6 @@
     <string name="response_failed">Response failed</string>
     <string name="movie_detail_image">Movie Detail Image</string>
     <string name="movie_poster_image">Movie Poster Image</string>
+    <string name="trailers">Trailers</string>
+    <string name="reviews">Reviews</string>
 </resources>

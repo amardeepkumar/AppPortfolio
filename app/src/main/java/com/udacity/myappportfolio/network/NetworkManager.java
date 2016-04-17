@@ -23,13 +23,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class NetworkManager {
 
     private static ApiService apiService;
-
     private static Retrofit getRetroFit() {
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        OkHttpClient httpClient = new OkHttpClient.Builder().addInterceptor(logging).build();
-        return new Retrofit.Builder()
-                .client(httpClient)
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+        return  new Retrofit.Builder()
                 .baseUrl(Config.UrlConstants.REQUEST_BASE_URL)
+                .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }
@@ -44,9 +45,9 @@ public class NetworkManager {
     public static void requestMovies(String sort, int page, Callback<DiscoverMovieResponse> callback) {
         ApiService service = getApiService();
         Map<String, String> options = new HashMap<>();
+        options.put(Config.UrlConstants.PAGE, String.valueOf(page));
         options.put(Config.UrlConstants.SORT_BY, sort);
         options.put(Config.UrlConstants.API_KEY, KeyConstants.API_KEY);
-        options.put(Config.UrlConstants.PAGE, String.valueOf(page));
         Call<DiscoverMovieResponse> model = service.requestMovies(options);
         model.enqueue(callback);
     }

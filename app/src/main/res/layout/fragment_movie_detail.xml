@@ -51,7 +51,7 @@
                     android:layout_alignParentRight="true"
                     android:onClick="@{clickHandler.onClick}"
                     android:padding="@dimen/dp_10"
-                    android:src="@{data.favourite ? @drawable/your_wish_list_1 : @drawable/your_wish_list}"/>
+                    android:src="@{data.favourite ? @drawable/your_wish_list_1 : @drawable/your_wish_list}" />
 
 
                 <TextView
@@ -90,6 +90,36 @@
                     android:text="@{data.overview}"
                     android:visibility="@{!TextUtils.isEmpty(data.overview) ? View.VISIBLE: View.GONE}" />
 
+                <TextView
+                    android:id="@+id/trailers"
+                    style="@style/movie_name_style"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/plot_synopsis"
+                    android:text="@string/trailers"
+                    android:visibility="@{!TextUtils.isEmpty(data.originalTitle) ? View.VISIBLE: View.GONE}" />
+
+                <LinearLayout
+                    android:id="@+id/movie_detail_trailer_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/trailers"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:id="@+id/reviews"
+                    style="@style/movie_name_style"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/movie_detail_trailer_layout"
+                    android:text="@string/reviews" />
+
+                <LinearLayout
+                    android:id="@+id/movie_detail_review_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/reviews"
+                    android:orientation="vertical" />
             </RelativeLayout>
         </ScrollView>
 

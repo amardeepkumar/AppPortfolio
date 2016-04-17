@@ -80,8 +80,7 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
     private final Callback<DiscoverMovieResponse> mCallBack = new Callback<DiscoverMovieResponse>() {
         @Override
         public void onResponse(Call<DiscoverMovieResponse> call, final Response<DiscoverMovieResponse> response) {
-//            final AtomicInteger responseCount = new AtomicInteger(0);
-            CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(getActivity().getContentResolver());
+            CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(mContext.getContentResolver());
             queryHandler.setAsyncApplyBatchListener(new CustomAsyncQueryHandler.AsyncApplyBatchListener() {
                 @Override
                 public void onApplyBatchComplete(int token, Object cookie, ContentProviderResult[] result) {
@@ -100,10 +99,6 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
                     .withSelection(null, null)
                     .build());
             queryHandler.applyBatch(1, null, MovieContract.CONTENT_AUTHORITY, ops);
-
-            /*queryHandler.startDelete(2, null, MovieContract.MovieEntry.CONTENT_URI, null, null);
-            queryHandler.startDelete(3, null, MovieContract.VideoEntry.CONTENT_URI, null, null);
-            queryHandler.startDelete(4, null, MovieContract.ReviewEntry.CONTENT_URI, null, null);*/
         }
 
         @Override
@@ -266,7 +261,7 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
 
             final List<MovieResult> results = response.body().getResults();
 
-            CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(getActivity().getContentResolver());
+            CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(mContext.getContentResolver());
             queryHandler.setAsyncBulkInsertListener(new CustomAsyncQueryHandler.AsyncBulkInsertListener() {
                 @Override
                 public void onBulkInsertComplete(int token, Object cookie, int result) {
@@ -312,7 +307,7 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
 
         }
 
-        return new CursorLoader(getActivity(),
+        return new CursorLoader(mContext,
                 MovieContract.MovieEntry.CONTENT_URI,
                 MOVIE_PROJECTION,
                 selection,

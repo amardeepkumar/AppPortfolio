@@ -1,6 +1,7 @@
 package com.udacity.myappportfolio.fragment;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
@@ -11,16 +12,18 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.udacity.myappportfolio.R;
 import com.udacity.myappportfolio.data.CustomAsyncQueryHandler;
 import com.udacity.myappportfolio.data.MovieContract;
 import com.udacity.myappportfolio.databinding.FragmentMovieDetailBinding;
+import com.udacity.myappportfolio.databinding.ReviewLayoutBinding;
+import com.udacity.myappportfolio.databinding.TrailerLayoutBinding;
 import com.udacity.myappportfolio.model.response.MovieDetailResponse;
 import com.udacity.myappportfolio.model.response.MovieResult;
 import com.udacity.myappportfolio.model.response.MovieReviewResponse;
@@ -33,7 +36,9 @@ import com.udacity.myappportfolio.utility.DatabaseUtils;
 import com.udacity.myappportfolio.utility.DialogUtils;
 import com.udacity.myappportfolio.utility.NetworkUtil;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -78,13 +83,15 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
     public static final int COLUMN_VIDEO_NAME = 10;
     public static final int COLUMN_VIDEO_KEY = 11;
     public static final int COLUMN_REVIEW_ID = 12;
-    public static final int COLUMN_CONTENT = 13;
-    public static final int COLUMN_AUTHOR = 14;
+    public static final int COLUMN_REVIEW_CONTENT = 13;
+    public static final int COLUMN_REVIEW_AUTHOR = 14;
     private static final int MOVIE_DETAIL_LOADER = 1;
 
     private String mMovieId;
     private FragmentMovieDetailBinding binding;
     private Cursor mCursor;
+    private LayoutInflater mInflater;
+    private AtomicInteger mResponseCount;
 
     public static MovieDetailFragment getInstance(String movieId) {
         MovieDetailFragment fragment = new MovieDetailFragment();
@@ -117,11 +124,13 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
                 actionBar.setHomeButtonEnabled(true);
             }
         }
+        mResponseCount = new AtomicInteger(0);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mInflater = inflater;
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie_detail, container, false);
 
         binding.setClickHandler(this);
@@ -162,6 +171,7 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
                 }
             });
         } else {
+            getLoaderManager().restartLoader(MOVIE_DETAIL_LOADER, null, MovieDetailFragment.this);
             DialogUtils.showToast(R.string.no_network, mContext);
             if (binding != null) {
                 binding.progressBar.setVisibility(View.GONE);
@@ -171,7 +181,6 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
 
     public void loadMovieDetails(String movieId) {
         mMovieId = movieId;
-        getLoaderManager().restartLoader(MOVIE_DETAIL_LOADER, null, this);
         loadMovieDetails();
     }
 
@@ -207,17 +216,17 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
 
         switch (v.getId()) {
             case R.id.favourite:
-                /*CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(getContext().getContentResolver());
-                ContentValues values = new ContentValues();
-                values.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, mMovieId);
-
-                queryHandler.startUpdate(1, null, MovieContract.MovieEntry.CONTENT_URI,
-                        values, MovieContract.MovieEntry._ID + " = ?",
-                        new String[]{mCursor.getString(MovieGalleryFragment.COLUMN_ID)});*/
-
-                if (mCursor != null && mMovieId != null) {
+                if (mCursor != null && mMovieId != null  && mCursor.moveToFirst()) {
                     DatabaseUtils.setFavourite(v.getContext(), mMovieId,
                             mCursor.getInt(MovieGalleryFragment.COLUMN_FAVOURITE) == 0 ? 1 : 0);
+                }
+                break;
+            case R.id.trailer:
+                final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube://" + v.getTag()));
+                intent.putExtra("force_fullscreen", true);
+                // Verify that the intent will resolve to an activity
+                if (intent.resolveActivity(mContext.getPackageManager()) != null) {
+                    mContext.startActivity(intent);
                 }
                 break;
         }
@@ -232,7 +241,7 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
             selection = MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
             selectionArgs = new String[]{mMovieId};
         }
-        return new CursorLoader(getActivity(),
+        return new CursorLoader(mContext,
                 uri,
                 MOVIE_DETAIL_PROJECTION,
                 selection,
@@ -242,16 +251,58 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        String movieId = null;
-        if (data != null && data.moveToFirst()) {
+        if (mMovieId != null && data != null && data.moveToFirst()) {
             mCursor = data;
-            movieId = data.getString(COLUMN_MOVIE_ID);
             if (binding != null) {
                 binding.setData(getMovieResultFromCursor(data));
+                getTrailers(data);
+                getReviews(data);
                 binding.progressBar.setVisibility(View.GONE);
             }
         }
-        Toast.makeText(getActivity(), "movie Id = " + movieId, Toast.LENGTH_SHORT).show();
+    }
+
+    private void getTrailers(Cursor cursor) {
+        List<String> videoKeys = new ArrayList<>();
+        binding.movieDetailTrailerLayout.removeAllViews();
+        do {
+            final String key = cursor.getString(COLUMN_VIDEO_KEY);
+            if (!TextUtils.isEmpty(key) && !videoKeys.contains(key)) {
+                VideoResult videoResult = new VideoResult();
+                videoResult.setId(cursor.getString(COLUMN_VIDEO_ID));
+                videoResult.setKey(key);
+                videoResult.setName(cursor.getString(COLUMN_VIDEO_NAME));
+                TrailerLayoutBinding trailerBinding = DataBindingUtil.inflate(mInflater,
+                        R.layout.trailer_layout, binding.movieDetailTrailerLayout, false);
+                trailerBinding.setTrailer(videoResult);
+                trailerBinding.setClickHandler(this);
+                binding.movieDetailTrailerLayout.addView(trailerBinding.getRoot());
+                videoKeys.add(key);
+            }
+        } while (cursor.moveToNext());
+        binding.movieDetailTrailerLayout.invalidate();
+    }
+
+    private void getReviews(Cursor cursor) {
+        cursor.moveToFirst();
+        List<String> reviewIds = new ArrayList<>();
+        binding.movieDetailReviewLayout.removeAllViews();
+        do {
+            final String id = cursor.getString(COLUMN_REVIEW_ID);
+            if (!TextUtils.isEmpty(id) && !reviewIds.contains(id)) {
+                ReviewResult reviewResult = new ReviewResult();
+                reviewResult.setId(cursor.getString(COLUMN_REVIEW_ID));
+                reviewResult.setAuthor(cursor.getString(COLUMN_REVIEW_AUTHOR));
+                reviewResult.setContent(cursor.getString(COLUMN_REVIEW_CONTENT));
+
+                ReviewLayoutBinding reviewLayoutBinding = DataBindingUtil.inflate(mInflater,
+                        R.layout.review_layout, binding.movieDetailTrailerLayout, false);
+                reviewLayoutBinding.setReview(reviewResult);
+                binding.movieDetailReviewLayout.addView(reviewLayoutBinding.getRoot());
+                reviewIds.add(id);
+            }
+        } while (cursor.moveToNext());
+        binding.movieDetailReviewLayout.invalidate();
     }
 
     private MovieResult getMovieResultFromCursor(Cursor cursor) {
@@ -273,10 +324,11 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
     private void saveTrailers(Response<MovieVideoResponse> response) {
         final List<VideoResult> results = response.body().getResults();
         if (results.size() > 0) {
-            CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(getActivity().getContentResolver());
+            CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(mContext.getContentResolver());
             queryHandler.setAsyncBulkInsertListener(new CustomAsyncQueryHandler.AsyncBulkInsertListener() {
                 @Override
                 public void onBulkInsertComplete(int token, Object cookie, int result) {
+                    refreshUi();
                 }
             });
 
@@ -296,13 +348,22 @@ public class MovieDetailFragment extends BaseFragment implements Callback<MovieD
         }
     }
 
+    private void refreshUi() {
+        if (mResponseCount.incrementAndGet() == 2) {
+            mResponseCount.set(0);
+            //All response came
+            getLoaderManager().restartLoader(MOVIE_DETAIL_LOADER, null, MovieDetailFragment.this);
+        }
+    }
+
     private void saveReviews(Response<MovieReviewResponse> response) {
         final List<ReviewResult> results = response.body().getResults();
         if (results.size() > 0) {
-            CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(getActivity().getContentResolver());
+            CustomAsyncQueryHandler queryHandler = new CustomAsyncQueryHandler(mContext.getContentResolver());
             queryHandler.setAsyncBulkInsertListener(new CustomAsyncQueryHandler.AsyncBulkInsertListener() {
                 @Override
                 public void onBulkInsertComplete(int token, Object cookie, int result) {
+                    refreshUi();
                 }
             });
 
