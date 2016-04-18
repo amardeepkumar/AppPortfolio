@@ -6,8 +6,7 @@ App will show the list of popular movies.
 
 If you have themoviedb.org API key
 ************************************************
-1. Create a file KeyConstants in "com.udacity.myappportfolio.utility" package.
-2. Add your themoviedb.org API key under "API_KEY" string constant. And you are done.
+1. Add your themoviedb.org API key under "MovieDbAPIKey" string in gradle.properties. And you are done.
 
 If you don’t already have an API key
 *************************************************

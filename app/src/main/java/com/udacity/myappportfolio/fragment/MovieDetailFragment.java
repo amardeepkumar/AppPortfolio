@@ -331,7 +331,7 @@ public class MovieDetailFragment extends BaseFragment implements View.OnClickLis
 
     private void refreshUi() {
         //Check the response count
-        if (mResponseCount.incrementAndGet() == 2) {
+        if (mResponseCount.incrementAndGet() == 2 && isAdded()) {
             mResponseCount.set(0);
             //All response came
             getLoaderManager().restartLoader(MOVIE_DETAIL_LOADER, null, MovieDetailFragment.this);

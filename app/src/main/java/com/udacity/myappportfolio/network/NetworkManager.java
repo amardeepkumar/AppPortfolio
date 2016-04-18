@@ -1,11 +1,11 @@
 package com.udacity.myappportfolio.network;
 
 
+import com.udacity.myappportfolio.BuildConfig;
 import com.udacity.myappportfolio.model.response.DiscoverMovieResponse;
 import com.udacity.myappportfolio.model.response.MovieDetailResponse;
 import com.udacity.myappportfolio.model.response.MovieReviewResponse;
 import com.udacity.myappportfolio.model.response.MovieVideoResponse;
-import com.udacity.myappportfolio.utility.KeyConstants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,26 +47,26 @@ public class NetworkManager {
         Map<String, String> options = new HashMap<>();
         options.put(Config.UrlConstants.PAGE, String.valueOf(page));
         options.put(Config.UrlConstants.SORT_BY, sort);
-        options.put(Config.UrlConstants.API_KEY, KeyConstants.API_KEY);
+        options.put(Config.UrlConstants.API_KEY, BuildConfig.OPEN_WEATHER_MAP_API_KEY);
         Call<DiscoverMovieResponse> model = service.requestMovies(options);
         model.enqueue(callback);
     }
 
     public static void requestMovieDetails(String movieId, Callback<MovieDetailResponse> callback) {
         ApiService service = getApiService();
-        Call<MovieDetailResponse> model = service.requestMovieDetail(movieId, KeyConstants.API_KEY);
+        Call<MovieDetailResponse> model = service.requestMovieDetail(movieId, BuildConfig.OPEN_WEATHER_MAP_API_KEY);
         model.enqueue(callback);
     }
 
     public static void requestMovieTrailers(String movieId, Callback<MovieVideoResponse> callback) {
         ApiService service = getApiService();
-        Call<MovieVideoResponse> model = service.requestMovieTrailers(movieId, KeyConstants.API_KEY);
+        Call<MovieVideoResponse> model = service.requestMovieTrailers(movieId, BuildConfig.OPEN_WEATHER_MAP_API_KEY);
         model.enqueue(callback);
     }
 
     public static void requestMovieReviews(String movieId, Callback<MovieReviewResponse> callback) {
         ApiService service = getApiService();
-        Call<MovieReviewResponse> model = service.requestMovieReviews(movieId, KeyConstants.API_KEY);
+        Call<MovieReviewResponse> model = service.requestMovieReviews(movieId, BuildConfig.OPEN_WEATHER_MAP_API_KEY);
         model.enqueue(callback);
     }
 }
