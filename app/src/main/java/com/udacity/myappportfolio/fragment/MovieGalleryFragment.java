@@ -66,6 +66,7 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
     public static final int COLUMN_IS_SELECTED = 5;
 
     private static final int MOVIE_GALLERY_LOADER = 0;
+    private static final String STATE_PAGE_LOADED = "STATE_PAGE_LOADED";
 
     private FragmentMovieGalleryBinding binding;
     private boolean loading;
@@ -124,7 +125,10 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mCurrentPage = PreferenceManager.getInstance().getInt(Constants.BundleKeys.PAGE_NUMBER, 0);
+
+        mCurrentPage = savedInstanceState != null
+                ? savedInstanceState.getInt(STATE_PAGE_LOADED, 0)
+                : 0;
     }
 
     @Override
@@ -132,6 +136,12 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
         super.onActivityCreated(savedInstanceState);
         getLoaderManager().initLoader(MOVIE_GALLERY_LOADER, null, this);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_PAGE_LOADED, mCurrentPage);
     }
 
     @Nullable
@@ -161,12 +171,18 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
             }
         };
 
-        //Remove pagination while user selects to see favourite movie list
-        if (PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
-                Constants.SortPreference.SORT_BY_POPULARITY) != Constants.SortPreference.SORT_BY_FAVOURITE) {
+        final int sortPref = PreferenceManager.getInstance().getInt(Constants.BundleKeys.SORT_PREFERENCE,
+                Constants.SortPreference.SORT_BY_POPULARITY);
+        //Add listener if sort pref is not SORT_BY_FAVOURITE
+        if (sortPref != Constants.SortPreference.SORT_BY_FAVOURITE) {
             binding.movieList.addOnScrollListener(mOnScrollListener);
+        }
+
+        //Initial loading the data if fresh launch
+        if (savedInstanceState == null && sortPref != Constants.SortPreference.SORT_BY_FAVOURITE) {
             loadMore(this);
         }
+
         return binding.getRoot();
     }
 
@@ -211,7 +227,6 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
     private void sortList(MenuItem item) {
         item.setChecked(true);
         mCurrentPage = 0;
-        PreferenceManager.getInstance().setInt(Constants.BundleKeys.PAGE_NUMBER, mCurrentPage);
         loadMore(mCallBack);
     }
 
@@ -262,7 +277,6 @@ public class MovieGalleryFragment extends BaseFragment  implements LoaderManager
         if (response != null && response.isSuccess()
                 && response.body() != null) {
             mCurrentPage = response.body().getPage();
-            PreferenceManager.getInstance().setInt(Constants.BundleKeys.PAGE_NUMBER, mCurrentPage);
 
             final List<MovieResult> results = response.body().getResults();
 

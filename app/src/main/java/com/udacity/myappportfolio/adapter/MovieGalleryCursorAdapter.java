@@ -17,7 +17,9 @@ import com.udacity.myappportfolio.data.MovieContract;
 import com.udacity.myappportfolio.databinding.ItemMovieGalleryBinding;
 import com.udacity.myappportfolio.fragment.MovieGalleryFragment;
 import com.udacity.myappportfolio.model.response.MovieResult;
+import com.udacity.myappportfolio.utility.Constants;
 import com.udacity.myappportfolio.utility.DatabaseUtils;
+import com.udacity.myappportfolio.utility.PreferenceManager;
 
 import java.util.ArrayList;
 
@@ -39,7 +41,7 @@ public class MovieGalleryCursorAdapter extends CursorRecyclerViewAdapter<MovieGa
         super(cursor);
         mOnItemClickListener = itemClickListener;
         mLayoutInflater = LayoutInflater.from(context);
-        previousSelection = -2;//Setting to a non reachable cursor position
+        previousSelection = PreferenceManager.getInstance().getInt(Constants.PREV_SELECTION, -2);//Setting to a non reachable cursor position
     }
 
     @Override
@@ -119,6 +121,7 @@ public class MovieGalleryCursorAdapter extends CursorRecyclerViewAdapter<MovieGa
                 }
                 //Setting the selection to clicked item
                 previousSelection = adapterPosition;
+                PreferenceManager.getInstance().setInt(Constants.PREV_SELECTION, previousSelection);
             }
         }
 

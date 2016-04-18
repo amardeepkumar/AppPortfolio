@@ -133,11 +133,20 @@ public class MovieDetailFragment extends BaseFragment implements View.OnClickLis
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_movie_detail, container, false);
 
         binding.setClickHandler(this);
-        if (mMovieId != null) {
+        if (savedInstanceState != null) {
+            mMovieId = savedInstanceState.getString(Constants.BundleKeys.ID, null);
+            getLoaderManager().restartLoader(MOVIE_DETAIL_LOADER, null, MovieDetailFragment.this);
+        } else if (mMovieId != null) {
             loadMovieDetails();
         }
 
         return binding.getRoot();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(Constants.BundleKeys.ID, mMovieId);
     }
 
     private void loadMovieDetails() {
