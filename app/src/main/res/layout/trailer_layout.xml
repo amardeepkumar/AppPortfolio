@@ -6,7 +6,7 @@
 
         <variable
             name="trailer"
-            type="com.udacity.myappportfolio.model.response.VideoResult" />
+            type="com.udacity.moviediary.model.response.VideoResult" />
 
         <variable
             name="clickHandler"

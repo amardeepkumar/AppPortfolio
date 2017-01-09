@@ -11,7 +11,7 @@
 
         <variable
             name="data"
-            type="com.udacity.myappportfolio.model.response.MovieResult" />
+            type="com.udacity.moviediary.model.response.MovieResult" />
 
         <variable
             name="clickHandler"

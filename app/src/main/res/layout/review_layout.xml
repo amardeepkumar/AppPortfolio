@@ -6,7 +6,7 @@
 
         <variable
             name="review"
-            type="com.udacity.myappportfolio.model.response.ReviewResult" />
+            type="com.udacity.moviediary.model.response.ReviewResult" />
 
     </data>
 

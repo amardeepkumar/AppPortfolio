@@ -6,11 +6,11 @@
 
         <variable
             name="data"
-            type="com.udacity.myappportfolio.model.response.MovieResult" />
+            type="com.udacity.moviediary.model.response.MovieResult" />
 
         <variable
             name="clickHandler"
-            type="com.udacity.myappportfolio.adapter.MovieGalleryCursorAdapter.MovieGalleryViewHolder" />
+            type="com.udacity.moviediary.adapter.MovieGalleryCursorAdapter.MovieGalleryViewHolder" />
     </data>
 
     <RelativeLayout

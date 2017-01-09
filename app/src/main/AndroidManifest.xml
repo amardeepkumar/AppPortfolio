@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.udacity.myappportfolio"
+    package="com.udacity.moviediary"
     android:installLocation="auto">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:name=".MyAppPortfolioApplication"
+        android:name="com.udacity.moviediary.MovieDiaryApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.MovieActivity"
+            android:name="com.udacity.moviediary.activity.MovieActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -26,8 +26,8 @@
 
         <provider
             android:exported="false"
-            android:authorities="com.udacity.myappportfolio"
-            android:name=".data.MovieProvider"/>
+            android:authorities="com.udacity.moviediary"
+            android:name="com.udacity.moviediary.data.MovieProvider"/>
     </application>
 
 </manifest>

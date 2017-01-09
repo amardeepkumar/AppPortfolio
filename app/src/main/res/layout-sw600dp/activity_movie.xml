@@ -34,7 +34,7 @@
 
             <fragment
                 android:id="@+id/movie_gallery_fragment"
-                android:name="com.udacity.myappportfolio.fragment.MovieGalleryFragment"
+                android:name="com.udacity.moviediary.fragment.MovieGalleryFragment"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
@@ -42,7 +42,7 @@
 
             <fragment
                 android:id="@+id/movie_detail_fragment"
-                android:name="com.udacity.myappportfolio.fragment.MovieDetailFragment"
+                android:name="com.udacity.moviediary.fragment.MovieDetailFragment"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.5" />
